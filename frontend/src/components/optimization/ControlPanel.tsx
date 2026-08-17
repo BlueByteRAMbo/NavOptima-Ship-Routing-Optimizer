@@ -24,9 +24,9 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   activeSimulation,
   onClearSimulation,
 }) => {
-  const [origin, setOrigin] = useState<string>('INBOM'); // Mumbai default
-  const [destination, setDestination] = useState<string>('LKCMB'); // Colombo default
-  const [ship, setShip] = useState<string>('CONT-01'); // Container default
+  const [origin, setOrigin] = useState<string>('mumbai'); // Mumbai default
+  const [destination, setDestination] = useState<string>('colombo'); // Colombo default
+  const [ship, setShip] = useState<string>('container'); // Container default
   const [optimization, setOptimization] = useState<OptimizationMode>('balanced');
 
   const sortedPorts = [...ports].sort((a, b) => a.name.localeCompare(b.name));

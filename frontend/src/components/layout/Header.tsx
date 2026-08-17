@@ -6,6 +6,7 @@ interface HeaderProps {
   showRiskLayer: boolean;
   onToggleWeather: () => void;
   onToggleRisk: () => void;
+  isBackendConnected?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -13,6 +14,7 @@ export const Header: React.FC<HeaderProps> = ({
   showRiskLayer,
   onToggleWeather,
   onToggleRisk,
+  isBackendConnected = false,
 }) => {
   const [time, setTime] = useState(new Date());
 
@@ -34,7 +36,17 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-4">
-        <span className="badge-warning">DEMO MODE</span>
+        {isBackendConnected ? (
+          <span className="px-2.5 py-1 text-xs rounded-full font-mono font-medium bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            LIVE BACKEND
+          </span>
+        ) : (
+          <span className="badge-warning flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+            DEMO MODE
+          </span>
+        )}
         <div className="flex items-center gap-1 text-maritime-cyan-dim text-sm font-mono">
           <Clock className="w-4 h-4" />
           {time.toISOString().replace('T', ' ').substring(0, 19)} UTC

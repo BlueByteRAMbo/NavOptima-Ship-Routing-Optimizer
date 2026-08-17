@@ -91,9 +91,10 @@ export async function getPorts(): Promise<Port[]> {
    Environment
    ═══════════════════════════════════════════════ */
 
-export async function getEnvironment(): Promise<EnvironmentCell[]> {
+export async function getEnvironment(limit: number = 1500): Promise<EnvironmentCell[]> {
   try {
-    return await apiFetch<EnvironmentCell[]>('/environment');
+    const query = limit > 0 ? `?limit=${limit}` : '';
+    return await apiFetch<EnvironmentCell[]>(`/environment${query}`);
   } catch {
     return DEMO_ENVIRONMENT;
   }
