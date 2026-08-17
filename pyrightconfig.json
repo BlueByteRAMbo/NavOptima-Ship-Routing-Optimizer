@@ -1,0 +1,11 @@
+{
+  "venvPath": ".",
+  "venv": ".venv",
+  "extraPaths": [
+    "./backend",
+    "./smart-ship-routing",
+    "./.venv/Lib/site-packages"
+  ],
+  "pythonVersion": "3.10",
+  "pythonPlatform": "Windows"
+}

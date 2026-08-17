@@ -7,13 +7,14 @@ The simulation advances in 5-minute ticks under continuous moving weather.
 Mid-edge, weather deterioration on the upcoming active corridor is detected,
 triggering time-dependent A* re-planning and 5% hysteresis acceptance.
 """
+import os
 from src.models import load_graph, Graph
 from src.weather import DeterministicWeatherEngine
 from src.optimizer import STRATEGIES, ShipConfig
 from src.router import RoutingResult
 from src.simulation import initialize_voyage, advance_voyage_simulation
 
-GRAPH_FILEPATH = "traffic.json"
+GRAPH_FILEPATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "traffic.json")
 
 
 def calculate_route_metrics(graph: Graph, route: RoutingResult) -> dict:
@@ -92,7 +93,7 @@ def main():
         storm_intensity = actual_weather.get_conditions(voyage.current_lat, voyage.current_lon, t_hours)
 
         # Print tick telemetry
-        print(f"T+{t_mins:02d} min ({t_hours:.2f}h) | Position: ({voyage.current_lat:.2f}°N, {voyage.current_lon:.2f}°E) | Segment: {voyage.current_node_id}->next ({voyage.segment_distance_traveled:.1f}nm) | Weather: {storm_intensity:.2f}")
+        print(f"T+{t_mins:02d} min ({t_hours:.2f}h) | Position: ({voyage.current_lat:.2f}N, {voyage.current_lon:.2f}E) | Segment: {voyage.current_node_id}->next ({voyage.segment_distance_traveled:.1f}nm) | Weather: {storm_intensity:.2f}")
 
         # Check if a rerouting event occurred during this tick
         if len(voyage.reroute_events) > num_events_before:
@@ -105,7 +106,7 @@ def main():
                 print("WEATHER DETERIORATION DETECTED")
                 print("======================================================================")
                 print(f"Time: T+{t_mins} min ({t_hours:.2f}h)")
-                print(f"Position: ({last_event.lat:.4f}°N, {last_event.lon:.4f}°E) [MID-EDGE on segment {voyage.current_node_id}]")
+                print(f"Position: ({last_event.lat:.4f}N, {last_event.lon:.4f}E) [MID-EDGE on segment {voyage.current_node_id}]")
                 print(f"Safety/Cost Deterioration: projected {voyage.projected_remaining_costs.get(voyage.current_node_id, 0.0):.4f} -> actual remaining {last_event.old_route_cost:.4f}")
                 print(f"Reason: Storm intensity on upcoming corridor crossed deterioration threshold")
 
@@ -113,7 +114,7 @@ def main():
                 print(f"Old remaining cost: {last_event.old_route_cost:.4f}")
                 print(f"New remaining cost: {last_event.new_route_cost:.4f}")
                 print(f"Improvement: {pct_impr:.2f}% (Threshold: 5.0%)")
-                print("\n✓ REROUTE ACCEPTED")
+                print("\n[OK] REROUTE ACCEPTED")
 
                 print("\n======================================================================")
                 print("NEW ROUTE")
