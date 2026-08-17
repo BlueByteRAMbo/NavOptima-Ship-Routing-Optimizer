@@ -1,0 +1,80 @@
+[
+  {
+    "source": "NOAA",
+    "dataset": "GFS 0.25deg (via NOMADS GRIB filter)",
+    "retrieved_at": null,
+    "valid_time": null,
+    "region": "Indian Ocean [lat -32..26, lon 25..105]",
+    "variables": ["wind_speed (m/s)", "wind_direction (deg, meteorological)"],
+    "units": {"wind_speed": "m/s", "wind_direction": "degrees"},
+    "resolution": "0.25 deg native, resampled to 0.5 deg common grid",
+    "processing": "GRIB2 -> xarray/cfgrib -> derive speed/direction from U/V -> regrid",
+    "status": "MOCK",
+    "note": "Ingestion script (noaa_ingest.py) is production-ready but requires network access to nomads.ncep.noaa.gov, unavailable in the current build environment. Current environment.json uses a physically-plausible simulated wind field instead."
+  },
+  {
+    "source": "Copernicus Marine",
+    "dataset": "GLOBAL_ANALYSISFORECAST_PHY (currents) + GLOBAL_ANALYSISFORECAST_WAV (waves)",
+    "retrieved_at": null,
+    "valid_time": null,
+    "region": "Indian Ocean [lat -32..26, lon 25..105]",
+    "variables": ["current_u (m/s)", "current_v (m/s)", "wave_height (m)", "wave_period (s)"],
+    "units": {"current_u": "m/s", "current_v": "m/s", "wave_height": "m", "wave_period": "s"},
+    "resolution": "~0.083 deg native, resampled to 0.5 deg common grid, surface layer only",
+    "processing": "copernicusmarine.subset() -> NetCDF -> xarray -> regrid",
+    "status": "MOCK",
+    "note": "Ingestion script (copernicus_ingest.py) is production-ready but requires a Copernicus Marine account and network access, unavailable here. Current environment.json uses a simulated ocean field instead."
+  },
+  {
+    "source": "ACLED",
+    "dataset": "ACLED conflict events (Indian Ocean coastal region)",
+    "retrieved_at": null,
+    "valid_time": null,
+    "region": "Indian Ocean [lat -32..26, lon 25..105]",
+    "variables": ["event_type", "latitude", "longitude", "fatalities", "event_date"],
+    "units": {"severity": "0-1 proxy derived from fatalities, documented heuristic"},
+    "resolution": "point events, converted to circular decay zones (radius_km=75)",
+    "processing": "ACLED REST API -> filter region/date -> severity heuristic -> security zones",
+    "status": "MOCK",
+    "note": "ACLED is a conflict-event dataset, not a dedicated maritime piracy feed. Requires an ACLED account/API key; unavailable here. cache/security_events.json currently contains one illustrative demo zone, clearly marked MOCK."
+  },
+  {
+    "source": "Global Fishing Watch",
+    "dataset": "public-global-fishing-effort:latest (4Wings API v3)",
+    "retrieved_at": "generated locally",
+    "valid_time": null,
+    "region": "Indian Ocean [lat -32..26, lon 25..105]",
+    "variables": ["traffic_density (0-1, AIS-derived fishing-vessel activity proxy)"],
+    "units": {"traffic_density": "unitless, 0=low activity, 1=high activity"},
+    "resolution": "1.0 deg (coarser than main grid; traffic signal is sparse)",
+    "processing": "MOCK fallback: port-proximity decay model, per spec section 17 (GFW is P2 and explicitly allowed to fall back to mock)",
+    "status": "MOCK",
+    "note": "GFW surfaces AIS-visible fishing-vessel activity/events, NOT a complete AIS feed of all vessel traffic. Real ingestion script (gfw_ingest.py) is ready but not run here (no API token / no network)."
+  },
+  {
+    "source": "Ports (curated)",
+    "dataset": "15-port canonical dataset",
+    "retrieved_at": "generated locally",
+    "valid_time": null,
+    "region": "Indian Ocean, 15 fixed ports",
+    "variables": ["lat", "lon", "congestion (0-1)", "waiting_hours"],
+    "units": {"waiting_hours": "hours"},
+    "resolution": "point locations",
+    "processing": "Coordinates curated from public geographic references (NOT cross-validated against a live port-authority API); congestion/waiting_hours are simulated demo values",
+    "status": "MOCK",
+    "note": "Recommend verifying exact port-anchor coordinates against an official nautical/port-authority source before any non-hackathon use."
+  },
+  {
+    "source": "OpenStreetMap",
+    "dataset": "basemap tiles",
+    "retrieved_at": null,
+    "valid_time": null,
+    "region": "n/a",
+    "variables": [],
+    "units": {},
+    "resolution": "n/a",
+    "processing": "Consumed directly by frontend Leaflet basemap; not used for data ingestion",
+    "status": "n/a",
+    "note": "No scraping performed; standard OSM tile usage only."
+  }
+]
