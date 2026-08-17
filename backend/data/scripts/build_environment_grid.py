@@ -130,18 +130,38 @@ def load_ports():
         return json.load(f)
 
 
+def load_ocean_lookup():
+    """Loads normalized Copernicus ocean data and builds a (lat, lon) lookup table."""
+    if not os.path.exists(RAW_OCEAN):
+        return {}
+    try:
+        with open(RAW_OCEAN, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        lookup = {}
+        for item in data:
+            lat = round(float(item["lat"]), 3)
+            lon = round(float(item["lon"]), 3)
+            lookup[(lat, lon)] = item
+        return lookup
+    except Exception as e:
+        print(f"Warning: Failed to load {RAW_OCEAN} ({e})")
+        return {}
+
+
 def build_grid():
     ports = load_ports()
+    ocean_lookup = load_ocean_lookup()
     lats = np.arange(LAT_MIN, LAT_MAX + RESOLUTION_DEG, RESOLUTION_DEG)
     lons = np.arange(LON_MIN, LON_MAX + RESOLUTION_DEG, RESOLUTION_DEG)
 
     have_real_weather = os.path.exists(RAW_WEATHER)
-    have_real_ocean = os.path.exists(RAW_OCEAN)
     have_real_security = os.path.exists(RAW_SECURITY)
     have_real_traffic = os.path.exists(RAW_TRAFFIC)
 
     now = datetime.now(timezone.utc).isoformat()
     cells = []
+    copernicus_matched = 0
+    copernicus_fallback = 0
 
     for lat in lats:
         for lon in lons:
@@ -151,18 +171,38 @@ def build_grid():
                 continue  # only keep navigable ocean cells -> smaller, faster grid
 
             wind_speed, wind_dir = synthetic_wind(lat_r, lon_r)
-            cu, cv, wh, wp = synthetic_ocean(lat_r, lon_r)
+
+            # Merge real Copernicus ocean data if available for this cell
+            if (lat_r, lon_r) in ocean_lookup:
+                rec = ocean_lookup[(lat_r, lon_r)]
+                cu = round(float(rec["current_u"]), 3)
+                cv = round(float(rec["current_v"]), 3)
+                wh = round(float(rec["wave_height"]), 2)
+                wp = round(float(rec["wave_period"]), 1)
+                copernicus_status = "CACHED"
+                copernicus_source = "Copernicus Marine"
+                copernicus_matched += 1
+            else:
+                cu, cv, wh, wp = synthetic_ocean(lat_r, lon_r)
+                copernicus_status = "MOCK"
+                copernicus_source = "Copernicus Marine (simulated fallback)"
+                copernicus_fallback += 1
+
             sec = synthetic_security(lat_r, lon_r)
             traf = synthetic_traffic(lat_r, lon_r, ports)
 
-            sources = []
-            statuses = {}
-            for name, have in [
-                ("NOAA", have_real_weather), ("Copernicus", have_real_ocean),
-                ("ACLED", have_real_security), ("GFW", have_real_traffic),
-            ]:
-                sources.append(name if have else f"{name} (simulated fallback)")
-                statuses[name] = "CACHED" if have else "MOCK"
+            sources = [
+                "NOAA" if have_real_weather else "NOAA (simulated fallback)",
+                copernicus_source,
+                "ACLED" if have_real_security else "ACLED (simulated fallback)",
+                "GFW" if have_real_traffic else "GFW (simulated fallback)",
+            ]
+            statuses = {
+                "NOAA": "CACHED" if have_real_weather else "MOCK",
+                "Copernicus": copernicus_status,
+                "ACLED": "CACHED" if have_real_security else "MOCK",
+                "GFW": "CACHED" if have_real_traffic else "MOCK",
+            }
 
             cells.append({
                 "lat": lat_r,
@@ -180,6 +220,10 @@ def build_grid():
                 "sources": sources,
                 "data_status": statuses,
             })
+
+    print(f"Canonical ocean cells: {len(cells)}")
+    print(f"Copernicus matched: {copernicus_matched}")
+    print(f"Copernicus fallback: {copernicus_fallback}")
 
     return cells
 

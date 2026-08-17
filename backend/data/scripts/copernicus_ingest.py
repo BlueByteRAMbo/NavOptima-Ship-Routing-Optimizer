@@ -42,8 +42,10 @@ from datetime import datetime, timezone, timedelta
 LAT_MIN, LAT_MAX = -32.0, 26.0
 LON_MIN, LON_MAX = 25.0, 105.0
 
-RAW_DIR = "../raw/copernicus"
-OUT_PATH = "../processed/ocean/ocean_grid.json"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
+RAW_DIR = os.path.join(DATA_DIR, "raw", "copernicus")
+OUT_PATH = os.path.join(DATA_DIR, "processed", "ocean", "ocean_grid.json")
 
 PHYSICS_DATASET_ID = "cmems_mod_glo_phy_anfc_0.083deg_PT1H-m"  # currents (confirm via `describe`)
 WAVES_DATASET_ID = "cmems_mod_glo_wav_anfc_0.083deg_PT3H-i"    # waves (confirm via `describe`)
@@ -67,7 +69,7 @@ def fetch_subset(dataset_id, variables, out_name):
         start_datetime=(now - timedelta(hours=3)).isoformat(),
         end_datetime=now.isoformat(),
         minimum_depth=0,
-        maximum_depth=1,  # surface layer only -- no 3D ocean model
+        maximum_depth=0.5,  # surface layer only (~0.494m)
         output_filename=out_path,
         force_download=True,
     )
@@ -77,35 +79,82 @@ def fetch_subset(dataset_id, variables, out_name):
 def normalize(currents_nc, waves_nc):
     import xarray as xr
 
+    environment_path = os.path.join(
+        DATA_DIR, "cache", "environment.json"
+    )
+
+    with open(environment_path, "r", encoding="utf-8") as f:
+        environment = json.load(f)
+
     ds_cur = xr.open_dataset(currents_nc)
     ds_wav = xr.open_dataset(waves_nc)
 
-    cells = []
+    # Select latest available time.
+    if "time" in ds_cur.coords:
+        ds_cur = ds_cur.isel(time=-1)
+
+    if "time" in ds_wav.coords:
+        ds_wav = ds_wav.isel(time=-1)
+
+    # Select the shallowest available depth.
+    if "depth" in ds_cur.coords:
+        ds_cur = ds_cur.isel(depth=0)
+
+    if "depth" in ds_wav.coords:
+        ds_wav = ds_wav.isel(depth=0)
+
     now = datetime.now(timezone.utc).isoformat()
-    lats = ds_cur.latitude.values
-    lons = ds_cur.longitude.values
 
-    for lat in lats:
-        for lon in lons:
-            try:
-                u = float(ds_cur["uo"].sel(latitude=lat, longitude=lon).isel(time=-1).values)
-                v = float(ds_cur["vo"].sel(latitude=lat, longitude=lon).isel(time=-1).values)
-                wh = float(ds_wav["VHM0"].sel(latitude=lat, longitude=lon, method="nearest").isel(time=-1).values)
-                wp = float(ds_wav["VTPK"].sel(latitude=lat, longitude=lon, method="nearest").isel(time=-1).values)
-            except Exception:
-                continue  # missing/land cell, skip
+    cells = []
 
-            cells.append({
-                "lat": round(float(lat), 3),
-                "lon": round(float(lon), 3),
-                "current_u": round(u, 3),
-                "current_v": round(v, 3),
-                "wave_height": round(wh, 2),
-                "wave_period": round(wp, 1),
-                "timestamp": now,
-                "source": "Copernicus Marine",
-                "data_status": "CACHED",
-            })
+    for cell in environment:
+        if not cell.get("is_ocean", True):
+            continue
+
+        lat = float(cell["lat"])
+        lon = float(cell["lon"])
+
+        try:
+            current = ds_cur[["uo", "vo"]].sel(
+                latitude=lat,
+                longitude=lon,
+                method="nearest"
+            )
+
+            waves = ds_wav[["VHM0", "VTPK"]].sel(
+                latitude=lat,
+                longitude=lon,
+                method="nearest"
+            )
+
+            u = float(current["uo"].values)
+            v = float(current["vo"].values)
+            wh = float(waves["VHM0"].values)
+            wp = float(waves["VTPK"].values)
+
+            if not all(
+                map(
+                    lambda x: x == x and abs(x) != float("inf"),
+                    [u, v, wh, wp]
+                )
+            ):
+                continue
+
+        except Exception:
+            continue
+
+        cells.append({
+            "lat": lat,
+            "lon": lon,
+            "current_u": round(u, 3),
+            "current_v": round(v, 3),
+            "wave_height": round(wh, 2),
+            "wave_period": round(wp, 1),
+            "timestamp": now,
+            "source": "Copernicus Marine",
+            "data_status": "CACHED",
+        })
+
     return cells
 
 
