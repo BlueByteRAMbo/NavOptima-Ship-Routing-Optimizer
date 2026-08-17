@@ -1,0 +1,27 @@
+{
+  "noaa": {
+    "last_attempt_at": "2026-08-17T08:59:54.291362+00:00",
+    "last_success_at": null,
+    "status": "failed: Command '['python3', 'noaa_ingest.py']' returned non-zero exit status 1."
+  },
+  "copernicus": {
+    "last_attempt_at": "2026-08-17T08:59:55.073747+00:00",
+    "last_success_at": null,
+    "status": "failed: Command '['python3', 'copernicus_ingest.py']' returned non-zero exit status 1."
+  },
+  "acled": {
+    "last_attempt_at": "2026-08-17T08:59:55.098404+00:00",
+    "last_success_at": "2026-08-17T08:59:55.098404+00:00",
+    "status": "ok"
+  },
+  "gfw": {
+    "last_attempt_at": "2026-08-17T08:59:55.259768+00:00",
+    "last_success_at": "2026-08-17T08:59:55.259768+00:00",
+    "status": "ok"
+  },
+  "ports": {
+    "last_attempt_at": "2026-08-17T08:59:55.466566+00:00",
+    "last_success_at": "2026-08-17T08:59:55.466566+00:00",
+    "status": "ok"
+  }
+}

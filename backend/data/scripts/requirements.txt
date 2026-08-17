@@ -1,0 +1,11 @@
+# Core (needed for ports/grid/validation, no network required)
+numpy
+pandas
+pyarrow
+global-land-mask
+requests
+
+# Real ingestion scripts (network + credentials required)
+xarray
+cfgrib
+copernicusmarine

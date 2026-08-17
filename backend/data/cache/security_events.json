@@ -1,0 +1,15 @@
+[
+  {
+    "id": "mock_1",
+    "type": "security",
+    "lat": 12.5,
+    "lon": 47.5,
+    "radius_km": 200,
+    "severity": 0.55,
+    "event_type": "illustrative demo zone",
+    "date": null,
+    "timestamp": "2026-08-17T08:59:55.232030+00:00",
+    "source": "demo dataset (not ACLED)",
+    "data_status": "MOCK"
+  }
+]
