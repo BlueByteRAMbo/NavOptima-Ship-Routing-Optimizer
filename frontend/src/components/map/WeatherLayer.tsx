@@ -1,5 +1,5 @@
-import React from 'react';
-import { Marker, Circle } from 'react-leaflet';
+import React, { useMemo } from 'react';
+import { Marker } from 'react-leaflet';
 import L from 'leaflet';
 import { EnvironmentCell } from '../../types/maritime';
 
@@ -9,7 +9,19 @@ interface WeatherLayerProps {
 }
 
 const WeatherLayer: React.FC<WeatherLayerProps> = ({ cells, visible }) => {
-  if (!visible) return null;
+  // Spatial downsampling to ensure at most ~300 visual markers rendered for maximum 60 FPS performance
+  const sampledCells = useMemo(() => {
+    if (!visible || !cells || cells.length === 0) return [];
+    
+    // Target maximum ~300 visible weather vector arrows on map
+    const TARGET_MAX_VECTORS = 300;
+    if (cells.length <= TARGET_MAX_VECTORS) return cells;
+
+    const step = Math.ceil(cells.length / TARGET_MAX_VECTORS);
+    return cells.filter((_, index) => index % step === 0);
+  }, [cells, visible]);
+
+  if (!visible || sampledCells.length === 0) return null;
 
   const getWindColor = (speed: number) => {
     if (speed < 15) return '#28D7A0';
@@ -19,32 +31,23 @@ const WeatherLayer: React.FC<WeatherLayerProps> = ({ cells, visible }) => {
 
   return (
     <>
-      {cells.map((cell, index) => {
+      {sampledCells.map((cell, index) => {
         const color = getWindColor(cell.wind_speed);
         
+        // Single lightweight SVG arrow icon representing wind/current direction & magnitude
         const arrowIcon = L.divIcon({
-          className: 'wind-arrow-icon',
-          html: `<div style="transform: rotate(${cell.wind_direction}deg); color: ${color}; opacity: 0.7; font-size: 14px; font-weight: bold; text-shadow: 0 0 2px rgba(0,0,0,0.5);">↑</div>`,
-          iconSize: [20, 20],
-          iconAnchor: [10, 10]
+          className: 'weather-vector-icon',
+          html: `<div style="transform: rotate(${cell.wind_direction}deg); color: ${color}; opacity: 0.85; font-size: 13px; font-weight: bold; line-height: 1; text-shadow: 0 0 3px rgba(0,0,0,0.8);">↑</div>`,
+          iconSize: [16, 16],
+          iconAnchor: [8, 8]
         });
 
         return (
-          <React.Fragment key={`env-${index}`}>
-            {/* Wave height indicator */}
-            <Circle
-              center={[cell.lat, cell.lon]}
-              radius={cell.wave_height * 5000} // Scale factor for visualization
-              pathOptions={{
-                color: '#4A6274',
-                fillColor: '#4A6274',
-                fillOpacity: 0.2,
-                weight: 1
-              }}
-            />
-            {/* Wind direction indicator */}
-            <Marker position={[cell.lat, cell.lon]} icon={arrowIcon} />
-          </React.Fragment>
+          <Marker
+            key={`weather-vec-${cell.lat}-${cell.lon}-${index}`}
+            position={[cell.lat, cell.lon]}
+            icon={arrowIcon}
+          />
         );
       })}
     </>

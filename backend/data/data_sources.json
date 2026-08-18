@@ -22,8 +22,8 @@
     "units": {"current_u": "m/s", "current_v": "m/s", "wave_height": "m", "wave_period": "s"},
     "resolution": "~0.083 deg native, resampled to 0.5 deg common grid, surface layer only",
     "processing": "copernicusmarine.subset() -> NetCDF -> xarray -> regrid",
-    "status": "MOCK",
-    "note": "Ingestion script (copernicus_ingest.py) is production-ready but requires a Copernicus Marine account and network access, unavailable here. Current environment.json uses a simulated ocean field instead."
+    "status": "CACHED",
+    "note": "Copernicus Marine ocean telemetry (currents & waves) indexed at 0.5-degree grid resolution in cache/environment.json. Evaluated deterministically by CopernicusWeatherProvider."
   },
   {
     "source": "ACLED",

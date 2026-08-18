@@ -34,6 +34,7 @@ const DataSourcesPanel: React.FC<DataSourcesPanelProps> = ({ sources }) => {
                 <span className="font-semibold text-white">{source.source}</span>
                 <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                   source.status === 'LIVE' ? 'bg-maritime-success/20 text-maritime-success' : 
+                  source.status === 'CACHED' ? 'bg-maritime-cyan/20 text-maritime-cyan' :
                   source.status === 'MOCK' ? 'bg-maritime-warning/20 text-maritime-warning' : 
                   'bg-maritime-danger/20 text-maritime-danger'
                 }`}>

@@ -1,311 +1,596 @@
 {
-  "_comment": "Smart Ship Routing — Indian Ocean Prototype Graph v2. All distances in nautical miles. Declared distance = Haversine * 1.12 corridor factor unless noted. Coordinates verified offshore. No edge crosses peninsular India or Sri Lanka.",
+  "_comment": "Smart Ship Routing \u2014 Indian Ocean Navigation Graph v3. Verified 100% offshore geometry, no land crossings.",
   "nodes": [
-    {"id": "Mumbai",           "name": "Port of Mumbai",                   "latitude": 18.94, "longitude": 72.82, "is_port": true},
-    {"id": "Colombo",          "name": "Port of Colombo",                  "latitude":  6.94, "longitude": 79.84, "is_port": true},
-    {"id": "Singapore",        "name": "Port of Singapore",                "latitude":  1.28, "longitude": 103.85,"is_port": true},
-    {"id": "Chennai",          "name": "Port of Chennai",                  "latitude": 13.09, "longitude": 80.30, "is_port": true},
-    {"id": "Kochi",            "name": "Port of Kochi",                    "latitude":  9.97, "longitude": 76.24, "is_port": true},
-    {"id": "Visakhapatnam",    "name": "Port of Visakhapatnam",            "latitude": 17.69, "longitude": 83.29, "is_port": true},
-    {"id": "Aden",             "name": "Port of Aden",                     "latitude": 12.79, "longitude": 45.01, "is_port": true},
-    {"id": "Male",             "name": "Port of Male (Maldives)",          "latitude":  4.17, "longitude": 73.51, "is_port": true},
-    {"id": "Yangon",           "name": "Port of Yangon",                   "latitude": 16.78, "longitude": 96.16, "is_port": true},
-    {"id": "Medan",            "name": "Port of Belawan/Medan",            "latitude":  3.78, "longitude": 98.68, "is_port": true},
-    {"id": "WP_Arabian_Sea",   "name": "Arabian Sea Waypoint",             "latitude": 14.50, "longitude": 65.00, "is_port": false},
-    {"id": "WP_Laccadive",     "name": "Laccadive Sea Waypoint",           "latitude":  8.00, "longitude": 75.00, "is_port": false},
-    {"id": "WP_Bay_of_Bengal", "name": "Bay of Bengal Waypoint",           "latitude":  6.00, "longitude": 88.00, "is_port": false},
-    {"id": "WP_Malacca_West",  "name": "Malacca Strait West Approach",     "latitude":  5.50, "longitude": 95.00, "is_port": false},
-    {"id": "WP_Malacca_Strait","name": "Malacca Strait Midpoint",          "latitude":  2.50, "longitude": 101.50,"is_port": false},
-    {"id": "WP_Lombok",        "name": "Lombok Strait Waypoint",           "latitude": -8.50, "longitude": 115.70,"is_port": false},
-    {"id": "WP_South_Indian_Ocean", "name": "South Indian Ocean Waypoint", "latitude":  2.00, "longitude": 78.00, "is_port": false}
+    {
+      "id": "Mumbai",
+      "name": "Port of Mumbai",
+      "latitude": 18.94,
+      "longitude": 72.82,
+      "is_port": true
+    },
+    {
+      "id": "Colombo",
+      "name": "Port of Colombo",
+      "latitude": 6.94,
+      "longitude": 79.84,
+      "is_port": true
+    },
+    {
+      "id": "Singapore",
+      "name": "Port of Singapore",
+      "latitude": 1.28,
+      "longitude": 103.85,
+      "is_port": true
+    },
+    {
+      "id": "Chennai",
+      "name": "Port of Chennai",
+      "latitude": 13.09,
+      "longitude": 80.3,
+      "is_port": true
+    },
+    {
+      "id": "Kochi",
+      "name": "Port of Kochi",
+      "latitude": 9.97,
+      "longitude": 76.24,
+      "is_port": true
+    },
+    {
+      "id": "Visakhapatnam",
+      "name": "Port of Visakhapatnam",
+      "latitude": 17.69,
+      "longitude": 83.29,
+      "is_port": true
+    },
+    {
+      "id": "Aden",
+      "name": "Port of Aden",
+      "latitude": 12.79,
+      "longitude": 45.01,
+      "is_port": true
+    },
+    {
+      "id": "Male",
+      "name": "Port of Male (Maldives)",
+      "latitude": 4.17,
+      "longitude": 73.51,
+      "is_port": true
+    },
+    {
+      "id": "Yangon",
+      "name": "Port of Yangon",
+      "latitude": 16.78,
+      "longitude": 96.16,
+      "is_port": true
+    },
+    {
+      "id": "Medan",
+      "name": "Port of Belawan/Medan",
+      "latitude": 3.78,
+      "longitude": 98.68,
+      "is_port": true
+    },
+    {
+      "id": "WP_Arabian_Sea",
+      "name": "Arabian Sea Waypoint",
+      "latitude": 14.5,
+      "longitude": 65.0,
+      "is_port": false
+    },
+    {
+      "id": "WP_Laccadive",
+      "name": "Laccadive Sea Waypoint",
+      "latitude": 8.0,
+      "longitude": 73.5,
+      "is_port": false
+    },
+    {
+      "id": "WP_Konkan_Offshore",
+      "name": "Konkan Offshore Waypoint",
+      "latitude": 13.0,
+      "longitude": 72.5,
+      "is_port": false
+    },
+    {
+      "id": "WP_Comorin",
+      "name": "Cape Comorin Offshore Waypoint",
+      "latitude": 7.2,
+      "longitude": 77.2,
+      "is_port": false
+    },
+    {
+      "id": "WP_South_Sri_Lanka",
+      "name": "South Sri Lanka Offshore Waypoint",
+      "latitude": 5.5,
+      "longitude": 79.5,
+      "is_port": false
+    },
+    {
+      "id": "WP_East_Sri_Lanka",
+      "name": "East Sri Lanka Offshore Waypoint",
+      "latitude": 5.5,
+      "longitude": 82.5,
+      "is_port": false
+    },
+    {
+      "id": "WP_Coromandel_Offshore",
+      "name": "Coromandel Offshore Waypoint",
+      "latitude": 15.5,
+      "longitude": 82.5,
+      "is_port": false
+    },
+    {
+      "id": "WP_Bay_of_Bengal",
+      "name": "Bay of Bengal Waypoint",
+      "latitude": 6.0,
+      "longitude": 88.0,
+      "is_port": false
+    },
+    {
+      "id": "WP_Andaman_Sea",
+      "name": "Andaman Sea Offshore Waypoint",
+      "latitude": 10.0,
+      "longitude": 95.5,
+      "is_port": false
+    },
+    {
+      "id": "WP_Malacca_West",
+      "name": "Malacca Strait West Approach",
+      "latitude": 6.0,
+      "longitude": 95.0,
+      "is_port": false
+    },
+    {
+      "id": "WP_Malacca_Strait",
+      "name": "Malacca Strait Midpoint",
+      "latitude": 2.5,
+      "longitude": 101.5,
+      "is_port": false
+    },
+    {
+      "id": "WP_South_Java",
+      "name": "South Java Offshore Waypoint",
+      "latitude": -10.5,
+      "longitude": 108.0,
+      "is_port": false
+    },
+    {
+      "id": "WP_Lombok",
+      "name": "Lombok Strait Waypoint",
+      "latitude": -8.5,
+      "longitude": 115.7,
+      "is_port": false
+    },
+    {
+      "id": "WP_Java_Sea",
+      "name": "Java Sea Waypoint",
+      "latitude": -3.5,
+      "longitude": 110.0,
+      "is_port": false
+    },
+    {
+      "id": "WP_Karimata",
+      "name": "Karimata Strait Waypoint",
+      "latitude": -1.5,
+      "longitude": 106.5,
+      "is_port": false
+    },
+    {
+      "id": "WP_South_Indian_Ocean",
+      "name": "South Indian Ocean Waypoint",
+      "latitude": 2.0,
+      "longitude": 78.0,
+      "is_port": false
+    }
   ],
   "edges": [
     {
-      "_note": "=== MUMBAI DEPARTURE CORRIDORS ===",
       "id": "E001",
-      "source_id": "Mumbai", "target_id": "WP_Laccadive",
-      "distance_nm": 750, "base_congestion": 0.08,
-      "notes": "Coastal southwest lane. Hugs Indian west coast offshore. Hav(18.94,72.82->8,75)=669nm *1.12=749. Midpoints stay 20-50nm west of coast."
+      "source_id": "Mumbai",
+      "target_id": "WP_Laccadive",
+      "distance_nm": 724,
+      "base_congestion": 0.08,
+      "notes": "Mumbai to Laccadive Sea (8.0N, 73.5E offshore)"
     },
     {
       "id": "E002",
-      "source_id": "Mumbai", "target_id": "WP_Arabian_Sea",
-      "distance_nm": 585, "base_congestion": 0.04,
-      "notes": "Open-ocean northwest route toward Arabian Sea. Hav(18.94,72.82->14.5,65)=523nm *1.12=586. All offshore."
+      "source_id": "Mumbai",
+      "target_id": "WP_Arabian_Sea",
+      "distance_nm": 575,
+      "base_congestion": 0.04
     },
     {
       "id": "E003",
-      "source_id": "Mumbai", "target_id": "Kochi",
-      "distance_nm": 644, "base_congestion": 0.12,
-      "notes": "Coastal Mumbai-Kochi lane, moderate congestion. Hav(18.94,72.82->9.97,76.24)=574nm *1.12=643. Stays offshore."
+      "source_id": "WP_Konkan_Offshore",
+      "target_id": "WP_Laccadive",
+      "distance_nm": 337,
+      "base_congestion": 0.08
     },
-
     {
-      "_note": "=== ARABIAN SEA ===",
+      "id": "E004",
+      "source_id": "WP_Konkan_Offshore",
+      "target_id": "Kochi",
+      "distance_nm": 314,
+      "base_congestion": 0.08
+    },
+    {
       "id": "E010",
-      "source_id": "WP_Arabian_Sea", "target_id": "Aden",
-      "distance_nm": 1311, "base_congestion": 0.18,
-      "notes": "Gulf of Aden corridor — piracy risk zone, high safety concern. Hav(14.5,65->12.79,45.01)=1170nm *1.12=1311."
+      "source_id": "WP_Arabian_Sea",
+      "target_id": "Aden",
+      "distance_nm": 1288,
+      "base_congestion": 0.18
     },
     {
       "id": "E011",
-      "source_id": "Aden", "target_id": "WP_Arabian_Sea",
-      "distance_nm": 1311, "base_congestion": 0.18,
-      "notes": "Return Gulf of Aden."
+      "source_id": "Aden",
+      "target_id": "WP_Arabian_Sea",
+      "distance_nm": 1288,
+      "base_congestion": 0.18
     },
     {
       "id": "E012",
-      "source_id": "WP_Arabian_Sea", "target_id": "Male",
-      "distance_nm": 895, "base_congestion": 0.04,
-      "notes": "Open ocean Arabian Sea to Maldives. Low congestion. Hav(14.5,65->4.17,73.51)=799nm *1.12=895."
+      "source_id": "WP_Arabian_Sea",
+      "target_id": "Male",
+      "distance_nm": 879,
+      "base_congestion": 0.04
     },
     {
       "id": "E013",
-      "source_id": "WP_Arabian_Sea", "target_id": "WP_Laccadive",
-      "distance_nm": 755, "base_congestion": 0.05,
-      "notes": "Arabian Sea to Laccadive Sea. Hav(14.5,65->8,75)=756nm *1.0=756 (nearly direct)."
+      "source_id": "WP_Arabian_Sea",
+      "target_id": "WP_Laccadive",
+      "distance_nm": 698,
+      "base_congestion": 0.05
     },
-
     {
-      "_note": "=== LACCADIVE SEA ===",
       "id": "E020",
-      "source_id": "WP_Laccadive", "target_id": "Colombo",
-      "distance_nm": 331, "base_congestion": 0.10,
-      "notes": "Laccadive to Colombo. Hav(8,75->6.94,79.84)=295nm *1.12=331."
+      "source_id": "WP_Laccadive",
+      "target_id": "Colombo",
+      "distance_nm": 421,
+      "base_congestion": 0.1
     },
     {
       "id": "E021",
-      "source_id": "WP_Laccadive", "target_id": "Male",
-      "distance_nm": 297, "base_congestion": 0.04,
-      "notes": "Laccadive to Maldives. Hav(8,75->4.17,73.51)=265nm *1.12=297."
+      "source_id": "WP_Laccadive",
+      "target_id": "Male",
+      "distance_nm": 253,
+      "base_congestion": 0.04
     },
     {
       "id": "E022",
-      "source_id": "WP_Laccadive", "target_id": "Kochi",
-      "distance_nm": 156, "base_congestion": 0.10,
-      "notes": "Short leg. Hav(8,75->9.97,76.24)=139nm *1.12=156."
+      "source_id": "WP_Laccadive",
+      "target_id": "Kochi",
+      "distance_nm": 221,
+      "base_congestion": 0.1
     },
     {
       "id": "E023",
-      "source_id": "Kochi", "target_id": "WP_Laccadive",
-      "distance_nm": 156, "base_congestion": 0.10,
-      "notes": "Return."
+      "source_id": "Kochi",
+      "target_id": "WP_Laccadive",
+      "distance_nm": 221,
+      "base_congestion": 0.1
     },
-
     {
-      "_note": "=== KOCHI / SOUTH INDIA ===",
       "id": "E030",
-      "source_id": "Kochi", "target_id": "Colombo",
-      "distance_nm": 314, "base_congestion": 0.14,
-      "notes": "Kochi to Colombo rounding Sri Lanka tip. Hav(9.97,76.24->6.94,79.84)=281nm *1.12=314."
+      "source_id": "Kochi",
+      "target_id": "WP_Comorin",
+      "distance_nm": 193,
+      "base_congestion": 0.1
     },
     {
       "id": "E031",
-      "source_id": "Kochi", "target_id": "Male",
-      "distance_nm": 480, "base_congestion": 0.05,
-      "notes": "Open ocean, low congestion. Hav(9.97,76.24->4.17,73.51)=437nm *1.10=480."
+      "source_id": "WP_Comorin",
+      "target_id": "Colombo",
+      "distance_nm": 174,
+      "base_congestion": 0.1
     },
-
     {
-      "_note": "=== MALDIVES ===",
+      "id": "E032",
+      "source_id": "Kochi",
+      "target_id": "Male",
+      "distance_nm": 423,
+      "base_congestion": 0.05
+    },
+    {
       "id": "E040",
-      "source_id": "Male", "target_id": "Colombo",
-      "distance_nm": 463, "base_congestion": 0.08,
-      "notes": "Hav(4.17,73.51->6.94,79.84)=413nm *1.12=463."
+      "source_id": "Male",
+      "target_id": "Colombo",
+      "distance_nm": 454,
+      "base_congestion": 0.08
     },
     {
       "id": "E041",
-      "source_id": "Male", "target_id": "WP_Bay_of_Bengal",
-      "distance_nm": 1100, "base_congestion": 0.03,
-      "notes": "Deep south open-ocean route Male to BoB. Very low congestion, long, isolated. Hav(4.17,73.51->6,88)=861nm. Actual corridor ~1100nm rounding Maldives atolls and into open ocean. This represents the safe but slow deep-south detour."
+      "source_id": "Male",
+      "target_id": "WP_Bay_of_Bengal",
+      "distance_nm": 961,
+      "base_congestion": 0.03
     },
-
     {
-      "_note": "=== COLOMBO DEPARTURES ===",
+      "id": "E042",
+      "source_id": "Male",
+      "target_id": "WP_South_Java",
+      "distance_nm": 2466,
+      "base_congestion": 0.02
+    },
+    {
       "id": "E050",
-      "source_id": "Colombo", "target_id": "WP_Bay_of_Bengal",
-      "distance_nm": 549, "base_congestion": 0.08,
-      "notes": "Colombo to BoB. Hav(6.94,79.84->6,88)=490nm *1.12=549."
+      "source_id": "Colombo",
+      "target_id": "WP_South_Sri_Lanka",
+      "distance_nm": 98,
+      "base_congestion": 0.08
     },
     {
       "id": "E051",
-      "source_id": "Colombo", "target_id": "Chennai",
-      "distance_nm": 415, "base_congestion": 0.28,
-      "notes": "High-traffic Indian coast lane. Hav(6.94,79.84->13.09,80.3)=370nm *1.12=415."
+      "source_id": "WP_South_Sri_Lanka",
+      "target_id": "WP_East_Sri_Lanka",
+      "distance_nm": 197,
+      "base_congestion": 0.08
     },
     {
       "id": "E052",
-      "source_id": "Colombo", "target_id": "WP_Laccadive",
-      "distance_nm": 331, "base_congestion": 0.10,
-      "notes": "Return."
+      "source_id": "WP_East_Sri_Lanka",
+      "target_id": "WP_Bay_of_Bengal",
+      "distance_nm": 363,
+      "base_congestion": 0.08
     },
     {
       "id": "E053",
-      "source_id": "Colombo", "target_id": "WP_South_Indian_Ocean",
-      "distance_nm": 320, "base_congestion": 0.03,
-      "notes": "South ocean detour from Colombo avoiding central BoB. Hav(6.94,79.84->2,78)=341nm."
+      "source_id": "WP_East_Sri_Lanka",
+      "target_id": "Chennai",
+      "distance_nm": 521,
+      "base_congestion": 0.12
     },
     {
       "id": "E054",
-      "source_id": "WP_South_Indian_Ocean", "target_id": "WP_Malacca_West",
-      "distance_nm": 1170, "base_congestion": 0.03,
-      "notes": "South Indian Ocean to Malacca West approach. Hav(2,78->5.5,95)=1082nm *1.08=1170."
+      "source_id": "Colombo",
+      "target_id": "WP_Laccadive",
+      "distance_nm": 421,
+      "base_congestion": 0.1
     },
-
     {
-      "_note": "=== CHENNAI / EAST COAST ===",
+      "id": "E055",
+      "source_id": "Colombo",
+      "target_id": "WP_South_Indian_Ocean",
+      "distance_nm": 348,
+      "base_congestion": 0.03
+    },
+    {
+      "id": "E056",
+      "source_id": "WP_South_Indian_Ocean",
+      "target_id": "WP_Malacca_West",
+      "distance_nm": 1151,
+      "base_congestion": 0.03
+    },
+    {
       "id": "E060",
-      "source_id": "Chennai", "target_id": "WP_Bay_of_Bengal",
-      "distance_nm": 698, "base_congestion": 0.12,
-      "notes": "Chennai to open BoB. Hav(13.09,80.3->6,88)=624nm *1.12=698."
+      "source_id": "Chennai",
+      "target_id": "WP_Bay_of_Bengal",
+      "distance_nm": 686,
+      "base_congestion": 0.12
     },
     {
       "id": "E061",
-      "source_id": "Chennai", "target_id": "Visakhapatnam",
-      "distance_nm": 365, "base_congestion": 0.20,
-      "notes": "East India coastal, moderate congestion. Hav(13.09,80.3->17.69,83.29)=326nm *1.12=365."
+      "source_id": "Chennai",
+      "target_id": "WP_Coromandel_Offshore",
+      "distance_nm": 212,
+      "base_congestion": 0.15
     },
-
     {
-      "_note": "=== VISAKHAPATNAM ===",
+      "id": "E062",
+      "source_id": "WP_Coromandel_Offshore",
+      "target_id": "Visakhapatnam",
+      "distance_nm": 153,
+      "base_congestion": 0.15
+    },
+    {
       "id": "E070",
-      "source_id": "Visakhapatnam", "target_id": "WP_Bay_of_Bengal",
-      "distance_nm": 845, "base_congestion": 0.10,
-      "notes": "Vizag to BoB. Hav(17.69,83.29->6,88)=754nm *1.12=845."
+      "source_id": "Visakhapatnam",
+      "target_id": "WP_Bay_of_Bengal",
+      "distance_nm": 830,
+      "base_congestion": 0.1
     },
     {
       "id": "E071",
-      "source_id": "Visakhapatnam", "target_id": "Yangon",
-      "distance_nm": 829, "base_congestion": 0.10,
-      "notes": "Bay of Bengal crossing. Hav(17.69,83.29->16.78,96.16)=740nm *1.12=829."
+      "source_id": "Visakhapatnam",
+      "target_id": "Yangon",
+      "distance_nm": 814,
+      "base_congestion": 0.1
     },
-
     {
-      "_note": "=== BAY OF BENGAL ===",
       "id": "E080",
-      "source_id": "WP_Bay_of_Bengal", "target_id": "WP_Malacca_West",
-      "distance_nm": 470, "base_congestion": 0.05,
-      "notes": "Standard BoB to Malacca approach. Hav(6,88->5.5,95)=419nm *1.12=470."
+      "source_id": "WP_Bay_of_Bengal",
+      "target_id": "WP_Malacca_West",
+      "distance_nm": 460,
+      "base_congestion": 0.05
     },
     {
       "id": "E081",
-      "source_id": "WP_Bay_of_Bengal", "target_id": "Yangon",
-      "distance_nm": 902, "base_congestion": 0.12,
-      "notes": "BoB to Yangon. Hav(6,88->16.78,96.16)=806nm *1.12=902."
+      "source_id": "WP_Bay_of_Bengal",
+      "target_id": "Yangon",
+      "distance_nm": 886,
+      "base_congestion": 0.12
     },
     {
       "id": "E082",
-      "source_id": "Yangon", "target_id": "WP_Malacca_West",
-      "distance_nm": 762, "base_congestion": 0.10,
-      "notes": "Yangon south to Malacca approach. Hav(16.78,96.16->5.5,95)=681nm *1.12=762."
+      "source_id": "Yangon",
+      "target_id": "WP_Andaman_Sea",
+      "distance_nm": 450,
+      "base_congestion": 0.1
     },
-
     {
-      "_note": "=== MALACCA / SINGAPORE APPROACHES ===",
+      "id": "E083",
+      "source_id": "WP_Andaman_Sea",
+      "target_id": "WP_Malacca_West",
+      "distance_nm": 266,
+      "base_congestion": 0.1
+    },
+    {
       "id": "E090",
-      "source_id": "WP_Malacca_West", "target_id": "Medan",
-      "distance_nm": 272, "base_congestion": 0.28,
-      "notes": "West approach to Medan. Hav(5.5,95->3.78,98.68)=243nm *1.12=272."
+      "source_id": "WP_Malacca_West",
+      "target_id": "Medan",
+      "distance_nm": 283,
+      "base_congestion": 0.28
     },
     {
       "id": "E091",
-      "source_id": "Medan", "target_id": "WP_Malacca_Strait",
-      "distance_nm": 208, "base_congestion": 0.42,
-      "notes": "Medan through Malacca Strait — VERY CONGESTED. Hav(3.78,98.68->2.5,101.5)=186nm *1.12=208."
+      "source_id": "Medan",
+      "target_id": "WP_Malacca_Strait",
+      "distance_nm": 204,
+      "base_congestion": 0.42
     },
     {
       "id": "E092",
-      "source_id": "WP_Malacca_Strait", "target_id": "Singapore",
-      "distance_nm": 178, "base_congestion": 0.72,
-      "notes": "Final Malacca Strait approach — HIGHEST CONGESTION. Hav(2.5,101.5->1.28,103.85)=159nm *1.12=178."
+      "source_id": "WP_Malacca_Strait",
+      "target_id": "Singapore",
+      "distance_nm": 175,
+      "base_congestion": 0.72
     },
     {
       "id": "E093",
-      "source_id": "WP_Malacca_West", "target_id": "WP_Bay_of_Bengal",
-      "distance_nm": 470, "base_congestion": 0.05,
-      "notes": "Return."
+      "source_id": "WP_Malacca_West",
+      "target_id": "WP_Bay_of_Bengal",
+      "distance_nm": 460,
+      "base_congestion": 0.05
     },
-
     {
-      "_note": "=== LOMBOK STRAIT ALTERNATIVE (slower, avoids Malacca congestion) ===",
       "id": "E100",
-      "source_id": "WP_Bay_of_Bengal", "target_id": "WP_Lombok",
-      "distance_nm": 2100, "base_congestion": 0.03,
-      "notes": "Deep south route to Lombok Strait. Passes south of Java. Very low congestion, very long. Hav(6,88->-8.5,115.7)~2050nm *1.02=2100. Used by LEAST_CONGESTED and SAFEST avoiding Malacca."
+      "source_id": "WP_Bay_of_Bengal",
+      "target_id": "WP_South_Java",
+      "distance_nm": 1708,
+      "base_congestion": 0.03
     },
     {
       "id": "E101",
-      "source_id": "WP_Lombok", "target_id": "Singapore",
-      "distance_nm": 1350, "base_congestion": 0.05,
-      "notes": "Lombok Strait north through Java Sea to Singapore. Hav(-8.5,115.7->1.28,103.85)~880nm. Actual nautical routing ~1350nm via Java Sea."
+      "source_id": "WP_South_Java",
+      "target_id": "WP_Lombok",
+      "distance_nm": 519,
+      "base_congestion": 0.03
     },
     {
       "id": "E102",
-      "source_id": "Male", "target_id": "WP_Lombok",
-      "distance_nm": 2955, "base_congestion": 0.02,
-      "notes": "Ultra-safe deep south route from Maldives bypassing all congested zones. Hav(4.17,73.51->-8.5,115.7)=2638nm *1.12=2955."
+      "source_id": "WP_Lombok",
+      "target_id": "WP_Java_Sea",
+      "distance_nm": 499,
+      "base_congestion": 0.04
     },
-
     {
-      "_note": "=== RETURN EDGES (for return voyages and connectivity) ===",
+      "id": "E103",
+      "source_id": "WP_Java_Sea",
+      "target_id": "WP_Karimata",
+      "distance_nm": 266,
+      "base_congestion": 0.05
+    },
+    {
+      "id": "E104",
+      "source_id": "WP_Karimata",
+      "target_id": "Singapore",
+      "distance_nm": 254,
+      "base_congestion": 0.08
+    },
+    {
       "id": "R001",
-      "source_id": "Singapore", "target_id": "WP_Malacca_Strait",
-      "distance_nm": 178, "base_congestion": 0.65,
-      "notes": "Return."
+      "source_id": "Singapore",
+      "target_id": "WP_Malacca_Strait",
+      "distance_nm": 175,
+      "base_congestion": 0.65
     },
     {
       "id": "R002",
-      "source_id": "WP_Malacca_Strait", "target_id": "Medan",
-      "distance_nm": 208, "base_congestion": 0.38,
-      "notes": "Return."
+      "source_id": "WP_Malacca_Strait",
+      "target_id": "Medan",
+      "distance_nm": 204,
+      "base_congestion": 0.38
     },
     {
       "id": "R003",
-      "source_id": "Medan", "target_id": "WP_Malacca_West",
-      "distance_nm": 272, "base_congestion": 0.24,
-      "notes": "Return."
+      "source_id": "Medan",
+      "target_id": "WP_Malacca_West",
+      "distance_nm": 283,
+      "base_congestion": 0.24
     },
     {
       "id": "R004",
-      "source_id": "WP_Bay_of_Bengal", "target_id": "Colombo",
-      "distance_nm": 549, "base_congestion": 0.08,
-      "notes": "Return BoB to Colombo."
+      "source_id": "WP_Bay_of_Bengal",
+      "target_id": "WP_East_Sri_Lanka",
+      "distance_nm": 363,
+      "base_congestion": 0.08
     },
     {
       "id": "R005",
-      "source_id": "WP_Bay_of_Bengal", "target_id": "Chennai",
-      "distance_nm": 698, "base_congestion": 0.12,
-      "notes": "Return BoB to Chennai."
+      "source_id": "WP_East_Sri_Lanka",
+      "target_id": "WP_South_Sri_Lanka",
+      "distance_nm": 197,
+      "base_congestion": 0.08
     },
     {
       "id": "R006",
-      "source_id": "WP_Laccadive", "target_id": "Mumbai",
-      "distance_nm": 750, "base_congestion": 0.08,
-      "notes": "Return to Mumbai."
+      "source_id": "WP_South_Sri_Lanka",
+      "target_id": "Colombo",
+      "distance_nm": 98,
+      "base_congestion": 0.08
     },
     {
       "id": "R007",
-      "source_id": "WP_Arabian_Sea", "target_id": "Mumbai",
-      "distance_nm": 585, "base_congestion": 0.04,
-      "notes": "Return."
+      "source_id": "Chennai",
+      "target_id": "WP_East_Sri_Lanka",
+      "distance_nm": 521,
+      "base_congestion": 0.12
     },
     {
       "id": "R008",
-      "source_id": "Colombo", "target_id": "Male",
-      "distance_nm": 463, "base_congestion": 0.08,
-      "notes": "Return Colombo to Male."
+      "source_id": "WP_Laccadive",
+      "target_id": "WP_Konkan_Offshore",
+      "distance_nm": 337,
+      "base_congestion": 0.08
     },
     {
       "id": "R009",
-      "source_id": "Kochi", "target_id": "Mumbai",
-      "distance_nm": 644, "base_congestion": 0.10,
-      "notes": "Return Kochi to Mumbai."
+      "source_id": "WP_Konkan_Offshore",
+      "target_id": "Mumbai",
+      "distance_nm": 393,
+      "base_congestion": 0.08
     },
     {
       "id": "R010",
-      "source_id": "WP_Malacca_West", "target_id": "Male",
-      "distance_nm": 1380, "base_congestion": 0.04,
-      "notes": "Return Malacca area to Maldives. Hav(5.5,95->4.17,73.51)=1230nm *1.12=1378. Round to 1380."
+      "source_id": "Kochi",
+      "target_id": "WP_Konkan_Offshore",
+      "distance_nm": 314,
+      "base_congestion": 0.08
+    },
+    {
+      "id": "R011",
+      "source_id": "WP_Arabian_Sea",
+      "target_id": "Mumbai",
+      "distance_nm": 575,
+      "base_congestion": 0.04
+    },
+    {
+      "id": "R012",
+      "source_id": "Colombo",
+      "target_id": "Male",
+      "distance_nm": 454,
+      "base_congestion": 0.08
+    },
+    {
+      "id": "R013",
+      "source_id": "Colombo",
+      "target_id": "WP_Comorin",
+      "distance_nm": 174,
+      "base_congestion": 0.1
+    },
+    {
+      "id": "R014",
+      "source_id": "WP_Comorin",
+      "target_id": "Kochi",
+      "distance_nm": 193,
+      "base_congestion": 0.1
+    },
+    {
+      "id": "R015",
+      "source_id": "WP_Malacca_West",
+      "target_id": "Male",
+      "distance_nm": 1419,
+      "base_congestion": 0.04
     }
   ]
 }

@@ -34,6 +34,7 @@ export interface Port {
   congestion: number;
   waiting_hours: number;
   utilization: number;
+  supported_in_routing?: boolean;
 }
 
 /* ═══════════════════════════════════════════════
@@ -53,7 +54,7 @@ export interface Ship {
    Optimization
    ═══════════════════════════════════════════════ */
 
-export type OptimizationMode = 'fastest' | 'safest' | 'fuel_efficient' | 'balanced';
+export type OptimizationMode = 'FASTEST' | 'SAFEST' | 'LEAST_CONGESTED' | 'BALANCED' | 'fastest' | 'safest' | 'least_congested' | 'balanced';
 
 export interface OptimizationPreset {
   id: OptimizationMode;
@@ -76,6 +77,7 @@ export interface RouteRequest {
   destination: string;
   ship: string;
   optimization: OptimizationMode;
+  data_mode?: 'HYBRID' | 'MOCK';
 }
 
 export interface RouteResponse {
@@ -84,16 +86,24 @@ export interface RouteResponse {
   eta_hours: number;
   fuel_mt: number;
   safety_score: number;
+  congestion_score?: number;
+  total_cost?: number;
   reason: string;
+  strategy?: string;
+  data_mode?: string;
+  data_status?: string;
+  routing_supported?: boolean;
+  path_nodes?: string[];
 }
 
 /* ═══════════════════════════════════════════════
-   Simulation
+   Simulation & Voyage Lifecycle
    ═══════════════════════════════════════════════ */
 
 export type SimulationEventType = 'storm' | 'port_congestion' | 'security';
 
 export interface SimulationEvent {
+  voyage_id?: string;
   type: SimulationEventType;
   lat: number;
   lon: number;
@@ -103,12 +113,73 @@ export interface SimulationEvent {
 }
 
 export interface SimulationResponse {
+  voyage_id?: string;
+  origin?: string;
+  destination?: string;
+  spatially_relevant?: boolean;
   old_route: [number, number][];
   new_route: [number, number][];
   reason: string;
   eta_change_hours: number;
   fuel_change_mt: number;
   safety_change: number;
+  congestion_change?: number;
+  rerouted?: boolean;
+  active_route?: RouteResponse;
+
+  // Structured Decision Log Fields (Phase 14 Section I)
+  event_type?: string;
+  timestamp?: number;
+  severity?: number;
+  eta_before?: number;
+  eta_after?: number;
+  fuel_before?: number;
+  fuel_after?: number;
+  safety_before?: number;
+  safety_after?: number;
+  cost_improvement_percent?: number;
+  hysteresis_threshold_percent?: number;
+  decision?: string;
+}
+
+export interface VoyageCreateRequest {
+  origin: string;
+  destination: string;
+  ship?: string;
+  optimization?: OptimizationMode;
+  data_mode?: 'HYBRID' | 'MOCK';
+  hysteresis_threshold?: number;
+}
+
+export interface VoyageStateResponse {
+  voyage_id: string;
+  origin: string;
+  destination: string;
+  ship: string;
+  strategy: string;
+  data_mode: string;
+  current_time: number;
+  current_lat: number;
+  current_lon: number;
+  current_node_id: string;
+  is_completed: boolean;
+  active_route: RouteResponse;
+  history?: any[];
+  reroute_events?: any[];
+}
+
+export interface TickResponse {
+  voyage_id: string;
+  current_time: number;
+  current_node_id: string;
+  current_lat: number;
+  current_lon: number;
+  is_completed: boolean;
+  active_route_nodes: string[];
+  active_route: RouteResponse;
+  rerouted_in_tick: boolean;
+  new_route_cost?: number;
+  reroute_event?: any;
 }
 
 /* ═══════════════════════════════════════════════
@@ -135,6 +206,7 @@ export interface FeedEvent {
   title: string;
   description: string;
   severity?: 'low' | 'medium' | 'high' | 'critical';
+  simulation_result?: SimulationResponse;
 }
 
 /* ═══════════════════════════════════════════════
@@ -147,12 +219,14 @@ export interface AppState {
   destinationPort: string;
   selectedShip: string;
   optimizationMode: OptimizationMode;
+  dataMode: 'HYBRID' | 'MOCK';
 
   // Route data
   currentRoute: RouteResponse | null;
   previousRoute: RouteResponse | null;
 
-  // Simulation
+  // Voyage / Simulation state
+  activeVoyage: VoyageStateResponse | null;
   activeSimulation: SimulationEvent | null;
   simulationResult: SimulationResponse | null;
 

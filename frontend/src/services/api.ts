@@ -1,6 +1,7 @@
 /**
  * NavOptima API Client Service
- * Tries FastAPI backend first, falls back to demo data if unavailable.
+ * Authoritative client communicating directly with FastAPI backend.
+ * NO SILENT FALLBACKS TO MOCK DEMO DATA.
  */
 
 import type {
@@ -11,24 +12,28 @@ import type {
   Port,
   EnvironmentCell,
   DataSource,
+  VoyageCreateRequest,
+  VoyageStateResponse,
+  TickResponse,
 } from '../types/maritime';
 
-import {
-  DEMO_PORTS,
-  DEMO_ENVIRONMENT,
-  DEMO_DATA_SOURCES,
-  DEMO_SIMULATION_RESPONSES,
-  getDemoRoute,
-} from '../data/demo';
-
-const API_BASE = '/api';
+const API_BASE = '/api/v1';
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   });
-  if (!res.ok) throw new Error(`API error ${res.status}: ${res.statusText}`);
+  if (!res.ok) {
+    let detail = '';
+    try {
+      const errJson = await res.json();
+      detail = errJson.detail || errJson.message || '';
+    } catch {
+      detail = res.statusText;
+    }
+    throw new Error(`API error ${res.status}: ${detail || res.statusText}`);
+  }
   return res.json();
 }
 
@@ -37,42 +42,48 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
    ═══════════════════════════════════════════════ */
 
 export async function calculateRoute(req: RouteRequest): Promise<RouteResponse> {
-  try {
-    return await apiFetch<RouteResponse>('/route', {
-      method: 'POST',
-      body: JSON.stringify(req),
-    });
-  } catch {
-    // Fallback to demo data
-    await simulateDelay(800);
-    return getDemoRoute(req.origin, req.destination, req.optimization);
-  }
+  return await apiFetch<RouteResponse>('/route', {
+    method: 'POST',
+    body: JSON.stringify(req),
+  });
 }
 
 /* ═══════════════════════════════════════════════
-   Simulation
+   Stateful Voyage Lifecycle
    ═══════════════════════════════════════════════ */
 
-export async function simulateEvent(event: SimulationEvent): Promise<SimulationResponse> {
-  try {
-    return await apiFetch<SimulationResponse>('/simulation/event', {
-      method: 'POST',
-      body: JSON.stringify(event),
-    });
-  } catch {
-    await simulateDelay(1200);
-    const response = DEMO_SIMULATION_RESPONSES[event.type];
-    if (response) return response;
-    // Generic fallback
-    return {
-      old_route: [],
-      new_route: [],
-      reason: `${event.type} event detected. Route recalculated.`,
-      eta_change_hours: 1.5,
-      fuel_change_mt: 3.0,
-      safety_change: 10,
-    };
-  }
+export async function initVoyage(req: VoyageCreateRequest): Promise<VoyageStateResponse> {
+  return await apiFetch<VoyageStateResponse>('/voyages', {
+    method: 'POST',
+    body: JSON.stringify(req),
+  });
+}
+
+export async function getVoyage(voyageId: string): Promise<VoyageStateResponse> {
+  return await apiFetch<VoyageStateResponse>(`/voyages/${voyageId}`);
+}
+
+export async function tickVoyage(voyageId: string, tickDuration: number = 1.0): Promise<TickResponse> {
+  return await apiFetch<TickResponse>(`/voyages/${voyageId}/tick`, {
+    method: 'POST',
+    body: JSON.stringify({ tick_duration: tickDuration }),
+  });
+}
+
+export async function getVoyageRoute(voyageId: string): Promise<RouteResponse> {
+  return await apiFetch<RouteResponse>(`/voyages/${voyageId}/route`);
+}
+
+/* ═══════════════════════════════════════════════
+   Simulation Disruptions
+   ═══════════════════════════════════════════════ */
+
+export async function simulateEvent(event: SimulationEvent, voyageId?: string): Promise<SimulationResponse> {
+  const path = voyageId ? `/voyages/${voyageId}/event` : '/simulation/event';
+  return await apiFetch<SimulationResponse>(path, {
+    method: 'POST',
+    body: JSON.stringify({ ...event, voyage_id: voyageId }),
+  });
 }
 
 /* ═══════════════════════════════════════════════
@@ -80,11 +91,7 @@ export async function simulateEvent(event: SimulationEvent): Promise<SimulationR
    ═══════════════════════════════════════════════ */
 
 export async function getPorts(): Promise<Port[]> {
-  try {
-    return await apiFetch<Port[]>('/ports');
-  } catch {
-    return DEMO_PORTS;
-  }
+  return await apiFetch<Port[]>('/ports');
 }
 
 /* ═══════════════════════════════════════════════
@@ -92,11 +99,7 @@ export async function getPorts(): Promise<Port[]> {
    ═══════════════════════════════════════════════ */
 
 export async function getEnvironment(): Promise<EnvironmentCell[]> {
-  try {
-    return await apiFetch<EnvironmentCell[]>('/environment');
-  } catch {
-    return DEMO_ENVIRONMENT;
-  }
+  return await apiFetch<EnvironmentCell[]>('/environment');
 }
 
 /* ═══════════════════════════════════════════════
@@ -104,11 +107,7 @@ export async function getEnvironment(): Promise<EnvironmentCell[]> {
    ═══════════════════════════════════════════════ */
 
 export async function getDataSources(): Promise<DataSource[]> {
-  try {
-    return await apiFetch<DataSource[]>('/data-sources');
-  } catch {
-    return DEMO_DATA_SOURCES;
-  }
+  return await apiFetch<DataSource[]>('/data-sources');
 }
 
 /* ═══════════════════════════════════════════════
@@ -117,17 +116,9 @@ export async function getDataSources(): Promise<DataSource[]> {
 
 export async function healthCheck(): Promise<boolean> {
   try {
-    const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(2000) });
+    const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) });
     return res.ok;
   } catch {
     return false;
   }
-}
-
-/* ═══════════════════════════════════════════════
-   Helpers
-   ═══════════════════════════════════════════════ */
-
-function simulateDelay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }

@@ -27,7 +27,10 @@ _environment_cache: Optional[List[Dict[str, Any]]] = None
 _data_sources_cache: Optional[List[Dict[str, Any]]] = None
 
 # Track graph-supported canonical ports (nodes present in traffic.json)
-GRAPH_SUPPORTED_PORT_IDS = {"mumbai", "colombo", "singapore", "kochi", "yangon"}
+GRAPH_SUPPORTED_PORT_IDS = {
+    "mumbai", "colombo", "singapore", "kochi", "yangon",
+    "chennai", "visakhapatnam", "aden", "male", "medan"
+}
 
 
 def get_ports_raw() -> List[Dict[str, Any]]:

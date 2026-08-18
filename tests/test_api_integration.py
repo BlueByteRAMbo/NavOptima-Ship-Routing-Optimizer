@@ -109,15 +109,21 @@ def test_route_calculation_mumbai_singapore():
 
 def test_simulation_event():
     """POST /api/simulation/event evaluates dynamic disruption and reroutes."""
+    # 1. Initialize voyage first
+    v_resp = client.post("/api/v1/voyages", json={"origin": "mumbai", "destination": "singapore", "ship": "container", "optimization": "BALANCED", "data_mode": "HYBRID"})
+    assert v_resp.status_code == 200
+    voyage_id = v_resp.json()["voyage_id"]
+
     payload = {
+        "voyage_id": voyage_id,
         "type": "storm",
-        "lat": 12.0,
-        "lon": 75.0,
-        "radius_km": 150,
+        "lat": 14.46,
+        "lon": 74.53,
+        "radius_km": 300,
         "severity": 0.9,
         "label": "Arabian Sea Tropical Storm",
     }
-    response = client.post("/api/simulation/event", json=payload)
+    response = client.post("/api/v1/simulation/event", json=payload)
     assert response.status_code == 200
     data = response.json()
 
@@ -129,3 +135,4 @@ def test_simulation_event():
     assert "eta_change_hours" in data
     assert "fuel_change_mt" in data
     assert "safety_change" in data
+
