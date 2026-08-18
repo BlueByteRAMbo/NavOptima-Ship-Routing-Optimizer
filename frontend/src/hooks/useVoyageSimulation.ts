@@ -27,7 +27,7 @@ export function useVoyageSimulation() {
   } = useApp();
 
   const [isPlaying, setIsPlaying] = useState(false);
-  // speedMultiplier can be a number (1, 2, 5, 10, 25, 50) or 'AUTO' (~75s demo target)
+  // speedMultiplier can be a number (1, 2, 5, 10, 25, 50) or 'AUTO' (~90s demo target)
   const [speedMultiplier, setSpeedMultiplier] = useState<number | 'AUTO'>('AUTO');
   const [alternativeRoute, setAlternativeRoute] = useState<RouteResponse | null>(null);
   const [viewingAlternative, setViewingAlternative] = useState(false);
@@ -36,16 +36,6 @@ export function useVoyageSimulation() {
   const [isProcessingDisruption, setIsProcessingDisruption] = useState(false);
 
   const timerRef = useRef<number | null>(null);
-
-  // Computed effective speed multiplier
-  const effectiveSpeed = useMemo(() => {
-    if (speedMultiplier === 'AUTO') {
-      const totalEta = currentRoute?.eta_hours || activeVoyage?.active_route?.eta_hours || 150;
-      // Target ~75 seconds total voyage duration
-      return Math.max(10, Math.round(totalEta / 75));
-    }
-    return speedMultiplier;
-  }, [speedMultiplier, currentRoute?.eta_hours, activeVoyage?.active_route?.eta_hours]);
 
   // Initialize event log on voyage load
   useEffect(() => {
@@ -63,15 +53,43 @@ export function useVoyageSimulation() {
     }
   }, [activeVoyage?.voyage_id]);
 
-  // Handle Play/Pause timer loop with dynamic speed scaling
+  // Handle Play/Pause timer loop with precise ~90 real-second playback duration
   useEffect(() => {
     if (!isPlaying || !activeVoyage || activeVoyage.is_completed) {
       if (timerRef.current) clearInterval(timerRef.current);
       return;
     }
 
-    const tickDurationHours = Math.max(0.5, effectiveSpeed * 0.1);
-    const intervalMs = effectiveSpeed >= 25 ? 60 : 120;
+    const totalEtaHours = currentRoute?.eta_hours || activeVoyage.active_route?.eta_hours || 180.0;
+    
+    // Calculate tickDurationHours & intervalMs based on playback speed mode
+    let intervalMs = 150;
+    let tickDurationHours = 1.0;
+
+    if (speedMultiplier === 'AUTO') {
+      // Target exactly ~90 real-world seconds for 0% -> 100% voyage completion
+      // 90 seconds @ 150ms interval = 600 total ticks
+      intervalMs = 150;
+      tickDurationHours = Math.max(0.1, totalEtaHours / 600.0);
+    } else {
+      const mult = typeof speedMultiplier === 'number' ? speedMultiplier : 10;
+      if (mult <= 2) {
+        intervalMs = 300;
+        tickDurationHours = mult * 0.3;
+      } else if (mult <= 5) {
+        intervalMs = 200;
+        tickDurationHours = mult * 0.2;
+      } else if (mult <= 10) {
+        intervalMs = 150;
+        tickDurationHours = mult * 0.15;
+      } else if (mult <= 25) {
+        intervalMs = 100;
+        tickDurationHours = mult * 0.1;
+      } else {
+        intervalMs = 80;
+        tickDurationHours = mult * 0.08;
+      }
+    }
 
     timerRef.current = window.setInterval(async () => {
       try {
@@ -118,7 +136,7 @@ export function useVoyageSimulation() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPlaying, activeVoyage?.voyage_id, effectiveSpeed, setActiveVoyage, setCurrentRoute]);
+  }, [isPlaying, activeVoyage?.voyage_id, speedMultiplier, currentRoute?.eta_hours, setActiveVoyage, setCurrentRoute]);
 
   // Restart Voyage to start position
   const restartVoyage = useCallback(async () => {
@@ -306,7 +324,7 @@ export function useVoyageSimulation() {
     setIsPlaying,
     speedMultiplier,
     setSpeedMultiplier,
-    effectiveSpeed,
+    effectiveSpeed: speedMultiplier === 'AUTO' ? 10 : speedMultiplier,
     alternativeRoute,
     viewingAlternative,
     setViewingAlternative,

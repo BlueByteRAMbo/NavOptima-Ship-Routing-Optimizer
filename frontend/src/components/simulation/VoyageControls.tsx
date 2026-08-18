@@ -78,9 +78,9 @@ export const VoyageControls: React.FC<VoyageControlsProps> = ({
                   ? 'bg-cyan-400 text-slate-950 font-extrabold shadow'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
-              title={s === 'AUTO' ? 'Auto Demo Mode (~75s playback)' : `${s}x Speed`}
+              title={s === 'AUTO' ? 'Auto Demo Mode (~90s playback)' : `${s}x Speed`}
             >
-              {s === 'AUTO' ? 'DEMO (~75s)' : `${s}x`}
+              {s === 'AUTO' ? 'DEMO (~90s)' : `${s}x`}
             </button>
           ))}
         </div>

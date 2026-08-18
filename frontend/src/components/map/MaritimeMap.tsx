@@ -59,7 +59,7 @@ const MaritimeMap: React.FC<MaritimeMapProps> = ({
   onResetView,
 }) => {
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full bg-[#091725]">
       {/* On-Map Disruption Decision Overlay Modal */}
       {activeDisruption && onAcceptAlternative && onKeepCurrent && (
         <OnMapDecisionOverlay
@@ -74,15 +74,18 @@ const MaritimeMap: React.FC<MaritimeMapProps> = ({
         />
       )}
 
+      {/* Styled Nautical Map Container */}
       <MapContainer
         center={[8, 72]}
         zoom={4}
-        className="w-full h-full z-0"
+        className="w-full h-full z-0 nautical-map-container"
         zoomControl={false}
       >
+        {/* Deep Nautical-Blue Basemap Tiles (Desaturated navy ocean, dark slate landmasses) */}
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://carto.com/">CartoDB</a>'
+          className="nautical-tiles"
         />
         
         <MapFocusHandler focusCoords={focusCoords} />
@@ -93,9 +96,22 @@ const MaritimeMap: React.FC<MaritimeMapProps> = ({
         <RiskLayer riskZones={riskZones} activeSimulation={activeSimulation} visible={showRiskLayer} />
       </MapContainer>
 
+      {/* Embedded Tile Filter: Deep Nautical Navy-Blue Ocean & Dark Slate Land */}
+      <style>{`
+        .nautical-tiles .leaflet-tile {
+          filter: contrast(1.18) brightness(1.12) hue-rotate(195deg) saturate(1.25) !important;
+        }
+      `}</style>
+
       {/* Legend Overlay */}
-      <div className="absolute bottom-4 left-4 z-[400] p-3 text-xs flex flex-col gap-1.5 rounded-xl border border-[#1D3A4C] bg-[#0A1B29]/90 backdrop-blur-md shadow-2xl">
-        <div className="font-semibold text-slate-400 mb-1 uppercase tracking-wider text-[10px]">Route & Congestion</div>
+      <div className="absolute bottom-4 left-4 z-[400] p-3 text-xs flex flex-col gap-1.5 rounded-xl border border-[#1D3A4C] bg-[#0A1B29]/95 backdrop-blur-md shadow-2xl">
+        <div className="font-bold text-slate-300 mb-0.5 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+          <span>🚢 Maritime Visual Hierarchy</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3.5 h-3.5 rounded-full bg-[#00F0FF] border border-white flex items-center justify-center text-[9px] shadow-glow">🚢</div>
+          <span className="text-cyan-300 font-bold">Vessel (Highest Priority)</span>
+        </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-1 rounded" style={{ background: '#00F0FF' }}></div>
           <span className="text-slate-200">Active Route — Low</span>
@@ -106,7 +122,7 @@ const MaritimeMap: React.FC<MaritimeMapProps> = ({
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-1 rounded" style={{ background: '#EF4444' }}></div>
-          <span className="text-red-400">High Congestion</span>
+          <span className="text-red-400">Severe Congestion</span>
         </div>
         <div className="flex items-center gap-2 border-t border-[#1D3A4C] pt-1 mt-0.5">
           <div className="w-4 h-0.5 border-t border-dashed border-slate-400"></div>

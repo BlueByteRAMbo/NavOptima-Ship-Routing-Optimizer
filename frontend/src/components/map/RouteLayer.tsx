@@ -19,20 +19,20 @@ function calculateBearing(lat1: number, lon1: number, lat2: number, lon2: number
 }
 
 // Deterministic segment congestion rating helper based on coordinates and backend data
-function getSegmentCongestionColor(lat1: number, lon1: number, lat2: number, lon2: number): string {
+function getSegmentCongestionColor(lat1: number, lon1: number, lat2: number, lon2: number): { color: string; glow: string } {
   const midLat = (lat1 + lat2) / 2;
   const midLon = (lon1 + lon2) / 2;
 
-  // Malacca Strait approach / Singapore region -> High Congestion (Red)
+  // Malacca Strait approach / Singapore region -> Severe Congestion (Red)
   if (midLat >= 1.0 && midLat <= 4.0 && midLon >= 98.0 && midLon <= 104.5) {
-    return '#EF4444'; // Red
+    return { color: '#EF4444', glow: '#F87171' }; // Severe Red
   }
   // Sri Lanka / Colombo approach -> Moderate Congestion (Amber/Yellow)
   if (midLat >= 5.5 && midLat <= 8.5 && midLon >= 78.5 && midLon <= 82.0) {
-    return '#F59E0B'; // Amber
+    return { color: '#F59E0B', glow: '#FBBF24' }; // Moderate Amber
   }
-  // Standard open ocean -> Low Congestion (Cyan/Teal)
-  return '#00F0FF';
+  // Standard open ocean -> Low Congestion (Bright Cyan)
+  return { color: '#00F0FF', glow: '#06B6D4' };
 }
 
 const RouteLayer: React.FC<RouteLayerProps> = ({ currentRoute, previousRoute, activeVoyage }) => {
@@ -93,13 +93,13 @@ const RouteLayer: React.FC<RouteLayerProps> = ({ currentRoute, previousRoute, ac
     };
   }, [activeVoyage, currentPositions]);
 
-  // Dynamic ship icon with calculated heading rotation
+  // High-visibility ship icon with dynamic heading rotation (Highest Visual Priority)
   const customShipIcon = useMemo(() => {
     return L.divIcon({
       className: 'ship-marker-animated',
-      html: `<div style="transform: rotate(${heading}deg); width: 26px; height: 26px; background: #06B6D4; border: 2px solid #FFFFFF; border-radius: 50%; box-shadow: 0 0 16px #06B6D4; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: transform 0.3s ease;">🚢</div>`,
-      iconSize: [26, 26],
-      iconAnchor: [13, 13],
+      html: `<div style="transform: rotate(${heading}deg); width: 32px; height: 32px; background: #00F0FF; border: 3px solid #FFFFFF; border-radius: 50%; box-shadow: 0 0 20px #00F0FF, 0 0 35px #06B6D4, 0 0 45px rgba(0,240,255,0.8); display: flex; align-items: center; justify-content: center; font-size: 15px; transition: transform 0.3s ease;">🚢</div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
     });
   }, [heading]);
 
@@ -125,7 +125,7 @@ const RouteLayer: React.FC<RouteLayerProps> = ({ currentRoute, previousRoute, ac
           pathOptions={{
             color: '#64748B',
             weight: 3,
-            opacity: 0.6,
+            opacity: 0.55,
             dashArray: '4, 6',
           }}
         />
@@ -137,8 +137,8 @@ const RouteLayer: React.FC<RouteLayerProps> = ({ currentRoute, previousRoute, ac
           positions={remainingPositions}
           pathOptions={{
             color: '#06B6D4',
-            weight: 8,
-            opacity: 0.3,
+            weight: 9,
+            opacity: 0.35,
             lineCap: 'round',
             lineJoin: 'round',
           }}
@@ -149,19 +149,32 @@ const RouteLayer: React.FC<RouteLayerProps> = ({ currentRoute, previousRoute, ac
       {remainingPositions.length > 1 &&
         remainingPositions.slice(0, -1).map((pos, idx) => {
           const nextPos = remainingPositions[idx + 1];
-          const color = getSegmentCongestionColor(pos[0], pos[1], nextPos[0], nextPos[1]);
+          const style = getSegmentCongestionColor(pos[0], pos[1], nextPos[0], nextPos[1]);
           return (
-            <Polyline
-              key={`seg-cong-${idx}`}
-              positions={[pos, nextPos]}
-              pathOptions={{
-                color: color,
-                weight: 4.5,
-                opacity: 0.95,
-                lineCap: 'round',
-                lineJoin: 'round',
-              }}
-            />
+            <React.Fragment key={`seg-cong-${idx}`}>
+              {style.color === '#EF4444' && (
+                <Polyline
+                  positions={[pos, nextPos]}
+                  pathOptions={{
+                    color: style.glow,
+                    weight: 8,
+                    opacity: 0.45,
+                    lineCap: 'round',
+                    lineJoin: 'round',
+                  }}
+                />
+              )}
+              <Polyline
+                positions={[pos, nextPos]}
+                pathOptions={{
+                  color: style.color,
+                  weight: 4.5,
+                  opacity: 1.0,
+                  lineCap: 'round',
+                  lineJoin: 'round',
+                }}
+              />
+            </React.Fragment>
           );
         })}
 
@@ -180,7 +193,7 @@ const RouteLayer: React.FC<RouteLayerProps> = ({ currentRoute, previousRoute, ac
         />
       ))}
 
-      {/* Animated Ship Vessel Indicator */}
+      {/* High-Visibility Animated Ship Vessel Marker (Highest Priority) */}
       {shipPosition && <Marker position={shipPosition} icon={customShipIcon} />}
     </>
   );

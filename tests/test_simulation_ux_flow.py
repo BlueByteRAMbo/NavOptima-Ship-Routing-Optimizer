@@ -105,9 +105,9 @@ def test_accept_alternative_state_transition():
 
 
 def test_auto_demo_speed_calculation():
-    """Validates AUTO DEMO speed multiplier calculation for ~75s playback."""
+    """Validates AUTO DEMO speed multiplier calculation for ~90s playback."""
     total_eta_hours = 225.0
-    target_real_seconds = 75.0
+    target_real_seconds = 90.0
     auto_speed = max(10, round(total_eta_hours / target_real_seconds))
     assert auto_speed == 10
     assert auto_speed >= 3

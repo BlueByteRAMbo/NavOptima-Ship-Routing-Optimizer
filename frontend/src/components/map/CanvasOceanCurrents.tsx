@@ -47,14 +47,12 @@ export const CanvasOceanCurrents: React.FC<CanvasOceanCurrentsProps> = ({ enviro
       return;
     }
 
-    // Filter environment cells strictly to Indian Ocean bounding box
     const ioCells = environment.filter(
       (c) => c.lon >= MIN_LON && c.lon <= MAX_LON && c.lat >= MIN_LAT && c.lat <= MAX_LAT
     );
 
     if (ioCells.length === 0) return;
 
-    // Create or select canvas overlay
     let canvas = canvasRef.current;
     if (!canvas) {
       canvas = document.createElement('canvas');
@@ -62,8 +60,8 @@ export const CanvasOceanCurrents: React.FC<CanvasOceanCurrentsProps> = ({ enviro
       canvas.style.top = '0';
       canvas.style.left = '0';
       canvas.style.pointerEvents = 'none';
-      canvas.style.zIndex = '200';
-      canvas.style.opacity = '0.75';
+      canvas.style.zIndex = '180'; // Positioned behind route layer (z-index 400+)
+      canvas.style.opacity = '0.85'; // High visibility contrast against nautical navy blue ocean
       map.getPanes().overlayPane.appendChild(canvas);
       canvasRef.current = canvas;
     }
@@ -79,7 +77,6 @@ export const CanvasOceanCurrents: React.FC<CanvasOceanCurrentsProps> = ({ enviro
 
     updateCanvasSize();
 
-    // Fast spatial grid lookup helper
     const getInterpolatedVector = (lat: number, lon: number) => {
       let nearest: EnvironmentCell | null = null;
       let minSqDist = Infinity;
@@ -99,8 +96,7 @@ export const CanvasOceanCurrents: React.FC<CanvasOceanCurrentsProps> = ({ enviro
       return { u: 0, v: 0 };
     };
 
-    // Initialize Particle System (800 particles)
-    const particleCount = 800;
+    const particleCount = 750;
     const particles: Particle[] = [];
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -116,8 +112,8 @@ export const CanvasOceanCurrents: React.FC<CanvasOceanCurrentsProps> = ({ enviro
     const renderFrame = () => {
       if (!ctx || !canvas) return;
 
-      // Semi-transparent clear to leave smooth particle flow trails
-      ctx.fillStyle = 'rgba(6, 19, 31, 0.12)';
+      // Clean nautical navy trail background fill
+      ctx.fillStyle = 'rgba(9, 23, 37, 0.16)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const zoom = map.getZoom();
@@ -139,10 +135,8 @@ export const CanvasOceanCurrents: React.FC<CanvasOceanCurrentsProps> = ({ enviro
         const speedMs = Math.sqrt(vec.u * vec.u + vec.v * vec.v);
         const speedKnots = speedMs * 1.94384;
 
-        // Convert lat/lon to canvas container pixel point
         const currentPt = map.latLngToContainerPoint([p.lat, p.lon]);
 
-        // Advance particle along vector (u = Eastward m/s, v = Northward m/s)
         const nextLat = p.lat + vec.v * speedScale;
         const nextLon = p.lon + vec.u * speedScale;
         const nextPt = map.latLngToContainerPoint([nextLat, nextLon]);
@@ -150,14 +144,14 @@ export const CanvasOceanCurrents: React.FC<CanvasOceanCurrentsProps> = ({ enviro
         p.lat = nextLat;
         p.lon = nextLon;
 
-        // Color gradient matching Copernicus Marine SWV (Sea Water Velocity)
-        let strokeColor = '#00F0FF'; // Low (<0.5 kn): Cyan
-        if (speedKnots > 2.0) {
-          strokeColor = '#FF3D00'; // Extreme (>2.0 kn): Coral Red
-        } else if (speedKnots > 1.2) {
-          strokeColor = '#FFEA00'; // High (>1.2 kn): Bright Yellow
-        } else if (speedKnots > 0.5) {
-          strokeColor = '#00E676'; // Moderate (>0.5 kn): Emerald
+        // Vivid Copernicus SWV palette
+        let strokeColor = '#00F0FF'; // Low (<0.8 kn): Cyan
+        if (speedKnots > 2.5) {
+          strokeColor = '#FF3D00'; // Extreme (>2.5 kn): Coral Red
+        } else if (speedKnots > 1.5) {
+          strokeColor = '#FFD600'; // High (>1.5 kn): Bright Gold
+        } else if (speedKnots > 0.8) {
+          strokeColor = '#00E676'; // Moderate (>0.8 kn): Emerald
         }
 
         const alpha = Math.sin((p.age / p.maxAge) * Math.PI);
@@ -166,8 +160,8 @@ export const CanvasOceanCurrents: React.FC<CanvasOceanCurrentsProps> = ({ enviro
         ctx.moveTo(currentPt.x, currentPt.y);
         ctx.lineTo(nextPt.x, nextPt.y);
         ctx.strokeStyle = strokeColor;
-        ctx.globalAlpha = alpha * 0.85;
-        ctx.lineWidth = speedKnots > 1.5 ? 2.2 : 1.4;
+        ctx.globalAlpha = alpha * 0.75;
+        ctx.lineWidth = speedKnots > 1.5 ? 1.8 : 1.2;
         ctx.stroke();
       }
 
@@ -177,7 +171,6 @@ export const CanvasOceanCurrents: React.FC<CanvasOceanCurrentsProps> = ({ enviro
 
     renderFrame();
 
-    // Map Event Listeners
     const onMapMove = () => {
       updateCanvasSize();
     };
@@ -240,22 +233,22 @@ export const CanvasOceanCurrents: React.FC<CanvasOceanCurrentsProps> = ({ enviro
 
   return (
     <>
-      {/* Ocean Current Click Telemetry Card */}
+      {/* Ocean Current On-Click Telemetry Card */}
       {hoverInfo && (
         <div 
-          className="pointer-events-auto fixed z-[500] glass-panel-solid p-3 rounded-lg border border-cyan-500/50 bg-[#06131F]/95 shadow-2xl text-xs space-y-1.5 transform -translate-x-1/2 -translate-y-full mb-4 min-w-[220px]"
+          className="pointer-events-auto fixed z-[500] p-3 rounded-xl border border-cyan-500/50 bg-[#0A1B29]/95 shadow-2xl text-xs space-y-1.5 transform -translate-x-1/2 -translate-y-full mb-4 min-w-[220px] backdrop-blur-md"
           style={{ left: hoverInfo.x, top: hoverInfo.y }}
         >
           <div className="font-bold text-white flex items-center justify-between border-b border-[#1D3A4C] pb-1">
-            <span className="flex items-center gap-1.5 text-cyan-400">
+            <span className="flex items-center gap-1.5 text-cyan-400 font-mono text-[11px]">
               <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-              OCEAN CURRENT
+              COPERNICUS CURRENT
             </span>
             <div className="flex items-center gap-1.5">
               <span className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${
-                hoverInfo.intensity === 'Extreme' ? 'bg-red-500/20 text-red-400' :
-                hoverInfo.intensity === 'High' ? 'bg-amber-500/20 text-amber-400' :
-                hoverInfo.intensity === 'Moderate' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-cyan-500/20 text-cyan-400'
+                hoverInfo.intensity === 'Extreme' ? 'bg-red-500/20 text-red-400 border border-red-500/40' :
+                hoverInfo.intensity === 'High' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' :
+                hoverInfo.intensity === 'Moderate' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40'
               }`}>
                 {hoverInfo.intensity}
               </span>
@@ -284,29 +277,6 @@ export const CanvasOceanCurrents: React.FC<CanvasOceanCurrentsProps> = ({ enviro
           </div>
         </div>
       )}
-
-      {/* Map Legend Overlay */}
-      <div className="absolute bottom-16 left-4 z-[400] glass-panel-solid p-3 rounded-lg border border-[#1D3A4C] bg-[#06131F]/90 shadow-xl text-xs flex flex-col gap-2 min-w-[220px]">
-        <div className="font-bold text-xs text-white uppercase tracking-wider flex items-center justify-between">
-          <span>Ocean Currents</span>
-          <span className="text-[9px] text-cyan-400 font-mono bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/30">Copernicus</span>
-        </div>
-
-        {/* Color Gradient Bar */}
-        <div className="flex flex-col gap-1">
-          <div className="h-2.5 w-full rounded bg-gradient-to-r from-[#00F0FF] via-[#00E676] via-[#FFEA00] to-[#FF3D00] border border-[#1D3A4C]"></div>
-          <div className="flex justify-between text-[9px] text-slate-400 font-mono">
-            <span>0.0 kn (Low)</span>
-            <span>1.0 kn</span>
-            <span>2.5+ kn (High)</span>
-          </div>
-        </div>
-
-        <div className="text-[9px] text-slate-400 flex items-center gap-1.5 pt-1 border-t border-[#1D3A4C]">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-          <span>Animated directional flow streamlines</span>
-        </div>
-      </div>
     </>
   );
 };
