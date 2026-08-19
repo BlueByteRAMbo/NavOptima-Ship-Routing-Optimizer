@@ -94,6 +94,9 @@ export interface RouteResponse {
   data_status?: string;
   routing_supported?: boolean;
   path_nodes?: string[];
+  security_advisories?: string[];
+  max_security_risk?: number;
+  intersected_security_zones?: any[];
 }
 
 /* ═══════════════════════════════════════════════
@@ -140,6 +143,9 @@ export interface SimulationResponse {
   cost_improvement_percent?: number;
   hysteresis_threshold_percent?: number;
   decision?: string;
+  security_advisories?: string[];
+  max_security_risk?: number;
+  intersected_security_zones?: any[];
 }
 
 export interface VoyageCreateRequest {

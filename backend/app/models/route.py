@@ -72,6 +72,9 @@ class RouteResponse(BaseModel):
     data_status: str = "CACHED"
     routing_supported: bool = True
     path_nodes: Optional[List[str]] = None
+    security_advisories: List[str] = Field(default_factory=list)
+    max_security_risk: float = 0.0
+    intersected_security_zones: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class SimulationEvent(BaseModel):
@@ -111,7 +114,10 @@ class SimulationResponse(BaseModel):
     safety_after: Optional[float] = None
     cost_improvement_percent: Optional[float] = None
     hysteresis_threshold_percent: Optional[float] = None
-    decision: Optional[str] = None  # 'REROUTE' | 'ROUTE_RETAINED' | 'SPATIALLY_IRRELEVANT' | 'NO_IMPACT'
+    decision: Optional[str] = None  # 'REROUTE' | 'ROUTE_RETAINED' | 'SPATIALLY_IRRELEVANT' | 'NO_IMPACT' | 'SECURITY_ALERT' | 'PORT_CONGESTION_UPDATED'
+    security_advisories: List[str] = Field(default_factory=list)
+    max_security_risk: float = 0.0
+    intersected_security_zones: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class VoyageCreateRequest(BaseModel):

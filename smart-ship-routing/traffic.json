@@ -182,6 +182,76 @@
       "latitude": 2.0,
       "longitude": 78.0,
       "is_port": false
+    },
+    {
+      "id": "Mundra",
+      "name": "Port of Mundra",
+      "latitude": 22.74,
+      "longitude": 69.71,
+      "is_port": true
+    },
+    {
+      "id": "Chattogram",
+      "name": "Port of Chattogram",
+      "latitude": 22.28,
+      "longitude": 91.83,
+      "is_port": true
+    },
+    {
+      "id": "Jebel_Ali",
+      "name": "Port of Jebel Ali",
+      "latitude": 25.01,
+      "longitude": 55.06,
+      "is_port": true
+    },
+    {
+      "id": "Salalah",
+      "name": "Port of Salalah",
+      "latitude": 17.02,
+      "longitude": 54.09,
+      "is_port": true
+    },
+    {
+      "id": "Mombasa",
+      "name": "Port of Mombasa",
+      "latitude": -4.04,
+      "longitude": 39.67,
+      "is_port": true
+    },
+    {
+      "id": "Dar_Es_Salaam",
+      "name": "Port of Dar es Salaam",
+      "latitude": -6.82,
+      "longitude": 39.27,
+      "is_port": true
+    },
+    {
+      "id": "Port_Louis",
+      "name": "Port of Port Louis",
+      "latitude": -20.16,
+      "longitude": 57.5,
+      "is_port": true
+    },
+    {
+      "id": "Durban",
+      "name": "Port of Durban",
+      "latitude": -29.86,
+      "longitude": 31.02,
+      "is_port": true
+    },
+    {
+      "id": "Port_Klang",
+      "name": "Port of Port Klang",
+      "latitude": 3.0,
+      "longitude": 101.39,
+      "is_port": true
+    },
+    {
+      "id": "Karachi",
+      "name": "Port of Karachi",
+      "latitude": 24.85,
+      "longitude": 67.0,
+      "is_port": true
     }
   ],
   "edges": [
@@ -591,6 +661,356 @@
       "target_id": "Male",
       "distance_nm": 1419,
       "base_congestion": 0.04
+    },
+    {
+      "id": "E200",
+      "source_id": "Mundra",
+      "target_id": "Mumbai",
+      "distance_nm": 310,
+      "base_congestion": 0.1
+    },
+    {
+      "id": "R200",
+      "source_id": "Mumbai",
+      "target_id": "Mundra",
+      "distance_nm": 310,
+      "base_congestion": 0.1
+    },
+    {
+      "id": "E201",
+      "source_id": "Mundra",
+      "target_id": "WP_Arabian_Sea",
+      "distance_nm": 573.8,
+      "base_congestion": 0.05
+    },
+    {
+      "id": "R201",
+      "source_id": "WP_Arabian_Sea",
+      "target_id": "Mundra",
+      "distance_nm": 573.8,
+      "base_congestion": 0.05
+    },
+    {
+      "id": "E202",
+      "source_id": "Mundra",
+      "target_id": "Karachi",
+      "distance_nm": 199.4,
+      "base_congestion": 0.08
+    },
+    {
+      "id": "R202",
+      "source_id": "Karachi",
+      "target_id": "Mundra",
+      "distance_nm": 199.4,
+      "base_congestion": 0.08
+    },
+    {
+      "id": "E203",
+      "source_id": "Karachi",
+      "target_id": "WP_Arabian_Sea",
+      "distance_nm": 644.2,
+      "base_congestion": 0.05
+    },
+    {
+      "id": "R203",
+      "source_id": "WP_Arabian_Sea",
+      "target_id": "Karachi",
+      "distance_nm": 644.2,
+      "base_congestion": 0.05
+    },
+    {
+      "id": "E204",
+      "source_id": "Karachi",
+      "target_id": "Salalah",
+      "distance_nm": 879.6,
+      "base_congestion": 0.06
+    },
+    {
+      "id": "R204",
+      "source_id": "Salalah",
+      "target_id": "Karachi",
+      "distance_nm": 879.6,
+      "base_congestion": 0.06
+    },
+    {
+      "id": "E205",
+      "source_id": "Karachi",
+      "target_id": "Jebel_Ali",
+      "distance_nm": 680,
+      "base_congestion": 0.1
+    },
+    {
+      "id": "R205",
+      "source_id": "Jebel_Ali",
+      "target_id": "Karachi",
+      "distance_nm": 680,
+      "base_congestion": 0.1
+    },
+    {
+      "id": "E206",
+      "source_id": "Jebel_Ali",
+      "target_id": "Salalah",
+      "distance_nm": 640,
+      "base_congestion": 0.15
+    },
+    {
+      "id": "R206",
+      "source_id": "Salalah",
+      "target_id": "Jebel_Ali",
+      "distance_nm": 640,
+      "base_congestion": 0.15
+    },
+    {
+      "id": "E207",
+      "source_id": "Jebel_Ali",
+      "target_id": "WP_Arabian_Sea",
+      "distance_nm": 860,
+      "base_congestion": 0.12
+    },
+    {
+      "id": "R207",
+      "source_id": "WP_Arabian_Sea",
+      "target_id": "Jebel_Ali",
+      "distance_nm": 860,
+      "base_congestion": 0.12
+    },
+    {
+      "id": "E208",
+      "source_id": "Salalah",
+      "target_id": "Aden",
+      "distance_nm": 590,
+      "base_congestion": 0.12
+    },
+    {
+      "id": "R208",
+      "source_id": "Aden",
+      "target_id": "Salalah",
+      "distance_nm": 590,
+      "base_congestion": 0.12
+    },
+    {
+      "id": "E209",
+      "source_id": "Salalah",
+      "target_id": "WP_Arabian_Sea",
+      "distance_nm": 661.2,
+      "base_congestion": 0.06
+    },
+    {
+      "id": "R209",
+      "source_id": "WP_Arabian_Sea",
+      "target_id": "Salalah",
+      "distance_nm": 661.2,
+      "base_congestion": 0.06
+    },
+    {
+      "id": "E210",
+      "source_id": "Mombasa",
+      "target_id": "Dar_Es_Salaam",
+      "distance_nm": 170,
+      "base_congestion": 0.08
+    },
+    {
+      "id": "R210",
+      "source_id": "Dar_Es_Salaam",
+      "target_id": "Mombasa",
+      "distance_nm": 170,
+      "base_congestion": 0.08
+    },
+    {
+      "id": "E211",
+      "source_id": "Mombasa",
+      "target_id": "Aden",
+      "distance_nm": 1060,
+      "base_congestion": 0.1
+    },
+    {
+      "id": "R211",
+      "source_id": "Aden",
+      "target_id": "Mombasa",
+      "distance_nm": 1060,
+      "base_congestion": 0.1
+    },
+    {
+      "id": "E212",
+      "source_id": "Mombasa",
+      "target_id": "Male",
+      "distance_nm": 2130.8,
+      "base_congestion": 0.03
+    },
+    {
+      "id": "R212",
+      "source_id": "Male",
+      "target_id": "Mombasa",
+      "distance_nm": 2130.8,
+      "base_congestion": 0.03
+    },
+    {
+      "id": "E213",
+      "source_id": "Dar_Es_Salaam",
+      "target_id": "Durban",
+      "distance_nm": 1460,
+      "base_congestion": 0.06
+    },
+    {
+      "id": "R213",
+      "source_id": "Durban",
+      "target_id": "Dar_Es_Salaam",
+      "distance_nm": 1460,
+      "base_congestion": 0.06
+    },
+    {
+      "id": "E214",
+      "source_id": "Dar_Es_Salaam",
+      "target_id": "Port_Louis",
+      "distance_nm": 1356.2,
+      "base_congestion": 0.04
+    },
+    {
+      "id": "R214",
+      "source_id": "Port_Louis",
+      "target_id": "Dar_Es_Salaam",
+      "distance_nm": 1356.2,
+      "base_congestion": 0.04
+    },
+    {
+      "id": "E215",
+      "source_id": "Port_Louis",
+      "target_id": "Durban",
+      "distance_nm": 1550,
+      "base_congestion": 0.04
+    },
+    {
+      "id": "R215",
+      "source_id": "Durban",
+      "target_id": "Port_Louis",
+      "distance_nm": 1550,
+      "base_congestion": 0.04
+    },
+    {
+      "id": "E216",
+      "source_id": "Port_Louis",
+      "target_id": "WP_South_Indian_Ocean",
+      "distance_nm": 1800,
+      "base_congestion": 0.03
+    },
+    {
+      "id": "R216",
+      "source_id": "WP_South_Indian_Ocean",
+      "target_id": "Port_Louis",
+      "distance_nm": 1800,
+      "base_congestion": 0.03
+    },
+    {
+      "id": "E217",
+      "source_id": "Port_Louis",
+      "target_id": "Male",
+      "distance_nm": 1774.2,
+      "base_congestion": 0.03
+    },
+    {
+      "id": "R217",
+      "source_id": "Male",
+      "target_id": "Port_Louis",
+      "distance_nm": 1774.2,
+      "base_congestion": 0.03
+    },
+    {
+      "id": "E218",
+      "source_id": "Chattogram",
+      "target_id": "Visakhapatnam",
+      "distance_nm": 566.0,
+      "base_congestion": 0.12
+    },
+    {
+      "id": "R218",
+      "source_id": "Visakhapatnam",
+      "target_id": "Chattogram",
+      "distance_nm": 566.0,
+      "base_congestion": 0.12
+    },
+    {
+      "id": "E219",
+      "source_id": "Chattogram",
+      "target_id": "Yangon",
+      "distance_nm": 420,
+      "base_congestion": 0.1
+    },
+    {
+      "id": "R219",
+      "source_id": "Yangon",
+      "target_id": "Chattogram",
+      "distance_nm": 420,
+      "base_congestion": 0.1
+    },
+    {
+      "id": "E220",
+      "source_id": "Chattogram",
+      "target_id": "WP_Bay_of_Bengal",
+      "distance_nm": 1022.4,
+      "base_congestion": 0.06
+    },
+    {
+      "id": "R220",
+      "source_id": "WP_Bay_of_Bengal",
+      "target_id": "Chattogram",
+      "distance_nm": 1022.4,
+      "base_congestion": 0.06
+    },
+    {
+      "id": "E221",
+      "source_id": "Port_Klang",
+      "target_id": "WP_Malacca_Strait",
+      "distance_nm": 35,
+      "base_congestion": 0.45
+    },
+    {
+      "id": "R221",
+      "source_id": "WP_Malacca_Strait",
+      "target_id": "Port_Klang",
+      "distance_nm": 35,
+      "base_congestion": 0.45
+    },
+    {
+      "id": "E222",
+      "source_id": "Port_Klang",
+      "target_id": "Singapore",
+      "distance_nm": 190,
+      "base_congestion": 0.6
+    },
+    {
+      "id": "R222",
+      "source_id": "Singapore",
+      "target_id": "Port_Klang",
+      "distance_nm": 190,
+      "base_congestion": 0.6
+    },
+    {
+      "id": "E223",
+      "source_id": "Port_Klang",
+      "target_id": "WP_Malacca_West",
+      "distance_nm": 431.2,
+      "base_congestion": 0.25
+    },
+    {
+      "id": "R223",
+      "source_id": "WP_Malacca_West",
+      "target_id": "Port_Klang",
+      "distance_nm": 431.2,
+      "base_congestion": 0.25
+    },
+    {
+      "id": "E224",
+      "source_id": "Port_Klang",
+      "target_id": "Medan",
+      "distance_nm": 170,
+      "base_congestion": 0.3
+    },
+    {
+      "id": "R224",
+      "source_id": "Medan",
+      "target_id": "Port_Klang",
+      "distance_nm": 170,
+      "base_congestion": 0.3
     }
   ]
 }

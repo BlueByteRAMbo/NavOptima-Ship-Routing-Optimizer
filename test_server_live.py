@@ -33,7 +33,7 @@ def main():
         r = requests.get(f"{base_url}/ports")
         assert r.status_code == 200
         ports = r.json()
-        assert len(ports) == 15
+        assert len(ports) == 20
         print(f"[OK] GET /api/ports -> {len(ports)} ports loaded")
 
         # 3. Environment

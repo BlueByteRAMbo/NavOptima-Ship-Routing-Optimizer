@@ -29,7 +29,9 @@ _data_sources_cache: Optional[List[Dict[str, Any]]] = None
 # Track graph-supported canonical ports (nodes present in traffic.json)
 GRAPH_SUPPORTED_PORT_IDS = {
     "mumbai", "colombo", "singapore", "kochi", "yangon",
-    "chennai", "visakhapatnam", "aden", "male", "medan"
+    "chennai", "visakhapatnam", "aden", "male", "medan",
+    "mundra", "chattogram", "jebel_ali", "salalah", "mombasa",
+    "dar_es_salaam", "port_louis", "durban", "port_klang", "karachi",
 }
 
 

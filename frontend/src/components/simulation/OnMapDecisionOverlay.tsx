@@ -1,5 +1,5 @@
-import React from 'react';
-import { AlertTriangle, CheckCircle2, Shield, Fuel, Clock, Crosshair, ArrowRight, Maximize2, Info } from 'lucide-react';
+import React, { useState } from 'react';
+import { AlertTriangle, CheckCircle2, Shield, Fuel, Clock, Crosshair, ArrowRight, Maximize2, Minimize2, Info } from 'lucide-react';
 import type { SimulationResponse, RouteResponse, VoyageStateResponse } from '../../types/maritime';
 
 interface OnMapDecisionOverlayProps {
@@ -23,6 +23,8 @@ export const OnMapDecisionOverlay: React.FC<OnMapDecisionOverlayProps> = ({
   onFocusMap,
   onResetView,
 }) => {
+  const [isMinimized, setIsMinimized] = useState(false);
+
   if (!activeDisruption) return null;
 
   const coords = (activeDisruption.new_route && activeDisruption.new_route.length > 0)
@@ -49,6 +51,33 @@ export const OnMapDecisionOverlay: React.FC<OnMapDecisionOverlayProps> = ({
   const etaDelta = activeDisruption.eta_change_hours || (altRemainingEta - currentRemainingEta);
   const isAlternativeBetter = (activeDisruption.decision === 'REROUTE' || (alternativeRoute && etaDelta < -0.5));
   const isSafetyViolated = (activeVoyage?.strategy === 'SAFEST' || activeVoyage?.strategy === 'safest') && (altSafetyScore < currentSafetyScore - 5);
+
+  if (isMinimized) {
+    return (
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex items-center gap-2.5 bg-[#0A1B29]/95 backdrop-blur-md border-2 border-amber-500/80 rounded-full px-4 py-2 shadow-2xl text-slate-200 cursor-pointer hover:border-amber-400 transition-all"
+             onClick={() => setIsMinimized(false)}>
+          <div className="w-6 h-6 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 animate-pulse">
+            <AlertTriangle className="w-3.5 h-3.5" />
+          </div>
+          <span className="text-xs font-bold text-amber-400">
+            ⚠️ Disruption Alert — Click to review reroute ({etaDelta >= 0 ? `ETA +${etaDelta.toFixed(1)}h` : `ETA ${etaDelta.toFixed(1)}h`})
+          </span>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMinimized(false);
+            }}
+            className="ml-1 px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-full text-[10px] font-extrabold flex items-center gap-1 transition-colors shadow"
+            title="Expand Reroute Decision Panel"
+          >
+            <Maximize2 className="w-3 h-3" />
+            <span>EXPAND</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] w-[94%] max-w-lg bg-[#0A1B29]/95 backdrop-blur-md border-2 border-amber-500/60 rounded-2xl p-4 shadow-2xl space-y-3 text-slate-200 animate-in fade-in zoom-in-95 duration-200">
@@ -89,6 +118,14 @@ export const OnMapDecisionOverlay: React.FC<OnMapDecisionOverlayProps> = ({
               <Maximize2 className="w-3.5 h-3.5" />
             </button>
           )}
+
+          <button
+            onClick={() => setIsMinimized(true)}
+            className="p-1 bg-[#06131F] hover:bg-slate-800 text-slate-300 border border-[#1D3A4C] rounded text-[10px] font-semibold transition-colors"
+            title="Minimize Overlay to Inspect Map"
+          >
+            <Minimize2 className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
 
@@ -122,6 +159,20 @@ export const OnMapDecisionOverlay: React.FC<OnMapDecisionOverlayProps> = ({
           </p>
         )}
       </div>
+
+      {/* Security Advisories List (if security threat detected) */}
+      {activeDisruption.security_advisories && activeDisruption.security_advisories.length > 0 && (
+        <div className="bg-[#101F2D] p-2.5 rounded-lg border border-amber-500/40 space-y-1">
+          <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-400">
+            <Shield className="w-3.5 h-3.5" /> Maritime Security Advisories (BMP5)
+          </div>
+          <ul className="text-[10px] font-mono text-slate-300 space-y-1 list-disc pl-4">
+            {activeDisruption.security_advisories.map((adv, idx) => (
+              <li key={idx}>{adv}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Side-by-Side Route Metrics Comparison Table (Calculated from CURRENT POSITION) */}
       <div className="grid grid-cols-2 gap-2 text-xs font-mono">
