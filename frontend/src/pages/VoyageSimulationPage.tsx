@@ -15,6 +15,7 @@ export const VoyageSimulationPage: React.FC = () => {
     activeVoyage,
     ports,
     environment,
+    riskZones,
     activeSimulation,
     showWeatherLayer,
     showRiskLayer,
@@ -96,7 +97,7 @@ export const VoyageSimulationPage: React.FC = () => {
           ports={ports}
           environment={environment}
           activeSimulation={activeSimulation}
-          riskZones={[]}
+          riskZones={riskZones}
           showWeatherLayer={showWeatherLayer}
           showRiskLayer={showRiskLayer}
           showOceanCurrents={showOceanCurrents}

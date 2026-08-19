@@ -7,6 +7,10 @@ import time
 import requests
 import sys
 
+# Ensure UTF-8 output on Windows console
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8")
+
 def main():
     print("Starting uvicorn server on http://127.0.0.1:8000...")
     proc = subprocess.Popen(

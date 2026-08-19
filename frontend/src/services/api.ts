@@ -111,6 +111,14 @@ export async function getDataSources(): Promise<DataSource[]> {
 }
 
 /* ═══════════════════════════════════════════════
+   Security
+   ═══════════════════════════════════════════════ */
+
+export async function getSecurity(): Promise<{ zones: Array<{ id: string; name: string; center_lat: number; center_lon: number; radius_km: number; risk_level: number; threat_type: string }>; cells: EnvironmentCell[] }> {
+  return await apiFetch<{ zones: Array<{ id: string; name: string; center_lat: number; center_lon: number; radius_km: number; risk_level: number; threat_type: string }>; cells: EnvironmentCell[] }>('/security');
+}
+
+/* ═══════════════════════════════════════════════
    Health Check
    ═══════════════════════════════════════════════ */
 

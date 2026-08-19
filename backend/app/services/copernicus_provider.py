@@ -59,6 +59,7 @@ class CopernicusWeatherProvider(BaseWeatherProvider):
                 wh = float(cell.get("wave_height", 0.0))
                 u = float(cell.get("current_u", 0.0))
                 v = float(cell.get("current_v", 0.0))
+                sec_risk = float(cell.get("security_risk", 0.0))
                 curr_speed = math.sqrt(u * u + v * v)
 
                 self.grid[key] = {
@@ -68,15 +69,16 @@ class CopernicusWeatherProvider(BaseWeatherProvider):
                     "current_u": u,
                     "current_v": v,
                     "current_speed": curr_speed,
+                    "security_risk": sec_risk,
                 }
         except Exception:
             pass
 
     def get_conditions(self, lat: float, lon: float, time_hours: float) -> float:
         """
-        Returns storm/weather intensity (scale 0.0 to 10.0) at (lat, lon, time_hours).
-        Evaluates real/cached Copernicus wave and ocean current fields, blended with
-        optional dynamic storm overlays.
+        Returns storm/weather/security intensity (scale 0.0 to 10.0) at (lat, lon, time_hours).
+        Evaluates real/cached Copernicus wave, ocean current fields, and security risk,
+        blended with optional dynamic storm overlays.
         """
         # Lookup nearest grid point (0.5 degree grid)
         key = (int(round(lat * 2)), int(round(lon * 2)))
@@ -86,13 +88,16 @@ class CopernicusWeatherProvider(BaseWeatherProvider):
             cell = self.grid[key]
             wh = cell["wave_height"]
             curr_speed = cell["current_speed"]
+            sec_risk = cell.get("security_risk", 0.0)
 
             # Wave height contribution: 1m wave ~ 1.5 intensity, 4m+ wave ~ 6.0+ intensity
             wave_penalty = wh * 1.5
             # Ocean current contribution: 1 m/s (~2 knots) ~ 2.0 intensity
             current_penalty = curr_speed * 2.0
+            # Security risk contribution: threat index (0-1) scaled to intensity
+            security_penalty = sec_risk * 3.0
 
-            copernicus_intensity = min(10.0, wave_penalty + current_penalty)
+            copernicus_intensity = min(10.0, wave_penalty + current_penalty + security_penalty)
         else:
             # Spatial boundary fallback search (nearest neighbor within 2 degrees)
             best_dist = 999.0
@@ -108,7 +113,8 @@ class CopernicusWeatherProvider(BaseWeatherProvider):
             if best_cell and best_dist <= 2.0:
                 wh = best_cell["wave_height"]
                 curr_speed = best_cell["current_speed"]
-                copernicus_intensity = min(10.0, wh * 1.5 + curr_speed * 2.0)
+                sec_risk = best_cell.get("security_risk", 0.0)
+                copernicus_intensity = min(10.0, wh * 1.5 + curr_speed * 2.0 + sec_risk * 3.0)
 
         # Blend with optional dynamic storm overlay
         if self.overlay_storm:

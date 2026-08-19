@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouting } from '../hooks/useRouting';
-import { getPorts, getEnvironment, getDataSources } from '../services/api';
+import { getPorts, getEnvironment, getDataSources, getSecurity } from '../services/api';
 import type {
   Port,
   EnvironmentCell,
@@ -27,6 +27,7 @@ interface AppContextType {
   ports: Port[];
   environment: EnvironmentCell[];
   dataSources: DataSource[];
+  riskZones: SimulationEvent[];
   loadError: string | null;
   showWeatherLayer: boolean;
   showRiskLayer: boolean;
@@ -58,6 +59,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [ports, setPorts] = useState<Port[]>([]);
   const [environment, setEnvironment] = useState<EnvironmentCell[]>([]);
   const [dataSources, setDataSources] = useState<DataSource[]>([]);
+  const [riskZones, setRiskZones] = useState<SimulationEvent[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const routing = useRouting();
@@ -100,6 +102,30 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   }, [showWeatherLayer, showOceanCurrents, environment.length]);
 
+  useEffect(() => {
+    let isMounted = true;
+    if (showRiskLayer && riskZones.length === 0) {
+      getSecurity()
+        .then((sec) => {
+          if (isMounted && sec?.zones) {
+            const mappedZones: SimulationEvent[] = sec.zones.map((z) => ({
+              type: 'security',
+              lat: z.center_lat,
+              lon: z.center_lon,
+              radius_km: z.radius_km,
+              severity: z.risk_level * 10,
+              label: z.name,
+            }));
+            setRiskZones(mappedZones);
+          }
+        })
+        .catch(() => {});
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [showRiskLayer, riskZones.length]);
+
   return (
     <AppContext.Provider
       value={{
@@ -107,6 +133,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         ports,
         environment,
         dataSources,
+        riskZones,
         loadError,
         showWeatherLayer,
         showRiskLayer,

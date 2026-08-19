@@ -281,6 +281,11 @@ def calculate_optimal_route(request: RouteRequest) -> RouteResponse:
         f"Computed over {data_mode} environmental data."
     )
 
+    from backend.app.services.security import assess_route_security
+    sec_eval = assess_route_security(coordinates)
+    if sec_eval.get("advisories"):
+        reason += f" Security Note: {'; '.join(sec_eval['advisories'])}"
+
     return RouteResponse(
         coordinates=coordinates,
         distance_km=dist_km,
@@ -513,6 +518,18 @@ def handle_simulation_event(event: SimulationEvent) -> SimulationResponse:
         else:
             raise KeyError(f"Voyage '{voyage_id}' not found. Please create a voyage session first.")
     elif len(_voyages_db) > 0:
+        voyage_id = list(_voyages_db.keys())[-1]
+        voyage = _voyages_db[voyage_id]
+        req = _voyage_request_db.get(voyage_id)
+    else:
+        # Automatically initialize default voyage session for standalone simulation testing
+        default_req = VoyageCreateRequest(
+            origin="mumbai",
+            destination="colombo",
+            ship="container",
+            optimization="balanced",
+        )
+        create_voyage(default_req)
         voyage_id = list(_voyages_db.keys())[-1]
         voyage = _voyages_db[voyage_id]
         req = _voyage_request_db.get(voyage_id)

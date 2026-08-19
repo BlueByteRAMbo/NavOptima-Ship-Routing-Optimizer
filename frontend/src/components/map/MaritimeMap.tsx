@@ -32,7 +32,13 @@ interface MaritimeMapProps {
 const MapFocusHandler: React.FC<{ focusCoords?: [number, number] | null }> = ({ focusCoords }) => {
   const map = useMap();
   useEffect(() => {
-    if (focusCoords && focusCoords[0] && focusCoords[1]) {
+    if (
+      focusCoords &&
+      typeof focusCoords[0] === 'number' &&
+      typeof focusCoords[1] === 'number' &&
+      !isNaN(focusCoords[0]) &&
+      !isNaN(focusCoords[1])
+    ) {
       map.flyTo(focusCoords, 6, { duration: 1.2 });
     }
   }, [focusCoords, map]);

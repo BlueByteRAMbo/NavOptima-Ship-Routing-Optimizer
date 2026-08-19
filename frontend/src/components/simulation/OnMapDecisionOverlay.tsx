@@ -25,8 +25,12 @@ export const OnMapDecisionOverlay: React.FC<OnMapDecisionOverlayProps> = ({
 }) => {
   if (!activeDisruption) return null;
 
-  const eventLat = activeDisruption.new_route?.[Math.floor((activeDisruption.new_route?.length || 0) / 2)]?.[0] || activeDisruption.old_route?.[Math.floor((activeDisruption.old_route?.length || 0) / 2)]?.[0] || 0;
-  const eventLon = activeDisruption.new_route?.[Math.floor((activeDisruption.new_route?.length || 0) / 2)]?.[1] || activeDisruption.old_route?.[Math.floor((activeDisruption.old_route?.length || 0) / 2)]?.[1] || 0;
+  const coords = (activeDisruption.new_route && activeDisruption.new_route.length > 0)
+    ? activeDisruption.new_route
+    : (activeDisruption.old_route && activeDisruption.old_route.length > 0)
+    ? activeDisruption.old_route
+    : null;
+  const midPoint = coords ? coords[Math.floor(coords.length / 2)] : null;
 
   // Authoritative Remaining ETA and Fuel from Current Vessel Position
   const totalOriginalEta = currentRoute?.eta_hours || activeVoyage?.active_route?.eta_hours || 0;
@@ -65,9 +69,9 @@ export const OnMapDecisionOverlay: React.FC<OnMapDecisionOverlayProps> = ({
         </div>
 
         <div className="flex items-center gap-1.5">
-          {onFocusMap && eventLat !== 0 && (
+          {onFocusMap && midPoint && midPoint.length >= 2 && (
             <button
-              onClick={() => onFocusMap(eventLat, eventLon)}
+              onClick={() => onFocusMap(midPoint[0], midPoint[1])}
               className="px-2 py-1 bg-[#06131F] hover:bg-slate-800 text-cyan-400 border border-cyan-500/40 rounded text-[10px] font-bold flex items-center gap-1 transition-colors"
               title="Focus Map on Disruption"
             >

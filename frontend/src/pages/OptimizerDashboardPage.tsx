@@ -10,6 +10,7 @@ export const OptimizerDashboardPage: React.FC = () => {
     ports,
     environment,
     dataSources,
+    riskZones,
     loadError,
     showWeatherLayer,
     showRiskLayer,
@@ -64,7 +65,7 @@ export const OptimizerDashboardPage: React.FC = () => {
             ports={ports}
             environment={environment}
             activeSimulation={activeSimulation}
-            riskZones={[]}
+            riskZones={riskZones}
             showWeatherLayer={showWeatherLayer}
             showRiskLayer={showRiskLayer}
             showOceanCurrents={showOceanCurrents}

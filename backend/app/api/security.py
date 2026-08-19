@@ -3,9 +3,18 @@ Security Risk API Router
 """
 from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Query
-from backend.app.services.security import get_security_grid, get_security_zones
+from pydantic import BaseModel
+from backend.app.services.security import (
+    get_security_grid,
+    get_security_zones,
+    assess_route_security,
+)
 
 router = APIRouter(tags=["Security"])
+
+
+class RouteSecurityAssessmentRequest(BaseModel):
+    coordinates: List[List[float]]
 
 
 @router.get("/security")
@@ -22,3 +31,10 @@ def get_security(
         "zones": zones,
         "cells": [c.model_dump() for c in cells if c.security_risk > 0.05],
     }
+
+
+@router.post("/security/assess")
+def assess_security(req: RouteSecurityAssessmentRequest) -> Dict[str, Any]:
+    """Evaluates security threat level and conflict zone intersections for a route."""
+    return assess_route_security(req.coordinates)
+

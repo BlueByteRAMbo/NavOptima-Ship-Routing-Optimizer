@@ -51,3 +51,65 @@ def get_security_zones() -> List[Dict[str, Any]]:
             "status": "MOCK",
         },
     ]
+
+
+def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Calculates great-circle distance between two points in km."""
+    import math
+    r = 6371.0
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat / 2.0) ** 2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2.0) ** 2
+    return r * 2.0 * math.atan2(math.sqrt(a), math.sqrt(1.0 - a))
+
+
+def assess_route_security(coordinates: List[List[float]]) -> Dict[str, Any]:
+    """
+    Evaluates security risk and zone intersections along a route trajectory.
+    Enforces real product rules (e.g. BMP5 counter-piracy and watch protocols).
+    """
+    zones = get_security_zones()
+    intersected_zones = []
+    max_risk = 0.0
+
+    if not coordinates:
+        return {
+            "is_secure": True,
+            "max_risk_level": 0.0,
+            "intersected_zones": [],
+            "advisories": [],
+        }
+
+    for zone in zones:
+        z_lat = float(zone["center_lat"])
+        z_lon = float(zone["center_lon"])
+        z_rad = float(zone["radius_km"])
+        z_risk = float(zone["risk_level"])
+
+        for pt in coordinates:
+            if len(pt) >= 2:
+                dist = _haversine_km(pt[0], pt[1], z_lat, z_lon)
+                if dist <= z_rad:
+                    intersected_zones.append({
+                        "zone_id": zone["id"],
+                        "zone_name": zone["name"],
+                        "threat_type": zone["threat_type"],
+                        "risk_level": z_risk,
+                        "distance_to_center_km": round(dist, 1),
+                    })
+                    if z_risk > max_risk:
+                        max_risk = z_risk
+                    break
+
+    advisories: List[str] = []
+    if max_risk >= 0.7:
+        advisories.append("High Risk Area (HRA) transit detected: BMP5 counter-piracy measures, 24h armed/radar watch required.")
+    elif max_risk >= 0.3:
+        advisories.append("Heightened security watch recommended: maintain continuous AIS broadcast and radar lookout.")
+
+    return {
+        "is_secure": max_risk < 0.7,
+        "max_risk_level": round(max_risk, 2),
+        "intersected_zones": intersected_zones,
+        "advisories": advisories,
+    }

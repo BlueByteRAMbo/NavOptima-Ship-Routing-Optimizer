@@ -213,34 +213,51 @@ export function useVoyageSimulation() {
       const result = await simulateEvent(eventPayload, activeVoyage.voyage_id);
       setActiveDisruption(result);
 
-      // Auto-pause playback to allow user decision on map overlay
+      // Auto-pause playback to allow user inspection & decision on map overlay
       setIsPlaying(false);
 
-      if (result.active_route) {
-        setCurrentRoute(result.active_route);
-        setActiveVoyage((prev) => prev ? { ...prev, active_route: result.active_route! } : null);
-      }
+      // Do NOT overwrite currentRoute or activeVoyage.active_route before acceptance.
+      // Store candidate separately and enable preview if a viable alternative exists.
+      const hasViableAlternative = Boolean(
+        result.new_route &&
+        result.new_route.length > 0 &&
+        (result.rerouted || result.decision === 'REROUTE' || result.new_route.length !== activeVoyage.active_route?.coordinates?.length)
+      );
 
-      if (result.new_route && result.new_route.length > 0 && result.decision !== 'REROUTE') {
-        setAlternativeRoute({
+      if (hasViableAlternative) {
+        const candidateRoute: RouteResponse = {
           coordinates: result.new_route,
-          distance_km: result.active_route?.distance_km || 0,
-          eta_hours: (result.eta_after || 0) - (result.eta_change_hours || 0),
-          fuel_mt: (result.fuel_after || 0) - (result.fuel_change_mt || 0),
-          safety_score: Math.max(1.0, (result.safety_after || 0) - 1.2),
-          reason: 'Evaluated alternative route (faster but lower safety score)',
-        });
+          distance_km: result.active_route?.distance_km || currentRoute?.distance_km || 0,
+          eta_hours: result.eta_after ?? (currentRoute?.eta_hours || 0) + (result.eta_change_hours || 0),
+          fuel_mt: result.fuel_after ?? (currentRoute?.fuel_mt || 0) + (result.fuel_change_mt || 0),
+          safety_score: result.safety_after ?? Math.max(1.0, (currentRoute?.safety_score || 0) + (result.safety_change || 0)),
+          reason: result.reason,
+          strategy: activeVoyage.strategy,
+          data_mode: activeVoyage.data_mode,
+          routing_supported: true,
+        };
+        setAlternativeRoute(candidateRoute);
+        setViewingAlternative(true);
       } else {
         setAlternativeRoute(null);
+        setViewingAlternative(false);
       }
+
+      const logTitle = hasViableAlternative
+        ? `⚠️ DISRUPTION DETECTED — CANDIDATE ROUTE AVAILABLE`
+        : `⚠️ DISRUPTION EVALUATED — NO ALTERNATIVE REQUIRED`;
+
+      const logDesc = hasViableAlternative
+        ? `${labelMap[type].toUpperCase()} detected. Simulation paused. Alternative route candidate ready for review.`
+        : `No viable alternative route is available. Continuing on the current route. Reason: ${result.reason}`;
 
       setEventLog((prev) => [
         {
           id: `log-${Date.now()}`,
           timeHours: activeVoyage.current_time,
           timestamp: new Date().toLocaleTimeString(),
-          title: `⚠️ DISRUPTION DETECTED — SIMULATION PAUSED`,
-          description: `${labelMap[type].toUpperCase()} detected. Voyage paused for decision. Reason: ${result.reason}`,
+          title: logTitle,
+          description: logDesc,
           type: 'disruption',
           result,
         },
@@ -251,9 +268,9 @@ export function useVoyageSimulation() {
     } finally {
       setIsProcessingDisruption(false);
     }
-  }, [activeVoyage, setCurrentRoute, setActiveVoyage]);
+  }, [activeVoyage, currentRoute]);
 
-  // Manual Override: Accept Alternative Route & Auto-Resume
+  // Manual Override: Accept Candidate Route & Resume Playback
   const acceptAlternativeRoute = useCallback(() => {
     if (!alternativeRoute || !activeVoyage) return;
 
@@ -268,8 +285,8 @@ export function useVoyageSimulation() {
         id: `log-${Date.now()}`,
         timeHours: activeVoyage.current_time,
         timestamp: new Date().toLocaleTimeString(),
-        title: '🔀 MANUAL OVERRIDE ACCEPTED',
-        description: `Alternative route selected by user. Active route updated. Voyage continuing from current position (${activeVoyage.current_lat.toFixed(2)}°, ${activeVoyage.current_lon.toFixed(2)}°).`,
+        title: '🔀 CANDIDATE ROUTE ACCEPTED',
+        description: `Alternative candidate route accepted by operator. Active voyage path updated. Voyage continuing from current position (${activeVoyage.current_lat.toFixed(2)}°, ${activeVoyage.current_lon.toFixed(2)}°).`,
         type: 'override',
       },
       ...prev,
@@ -279,7 +296,7 @@ export function useVoyageSimulation() {
     setIsPlaying(true);
   }, [alternativeRoute, activeVoyage, setCurrentRoute, setActiveVoyage]);
 
-  // Keep Current Route & Auto-Resume
+  // Retain Current Route & Resume Playback
   const keepCurrentRoute = useCallback(() => {
     if (!activeVoyage) return;
 
@@ -293,7 +310,7 @@ export function useVoyageSimulation() {
         timeHours: activeVoyage.current_time,
         timestamp: new Date().toLocaleTimeString(),
         title: '🛡️ CURRENT ROUTE RETAINED',
-        description: `User selected to keep current route geometry. Voyage continuing towards destination.`,
+        description: `Operator retained current active route geometry. Voyage continuing towards destination.`,
         type: 'info',
       },
       ...prev,
